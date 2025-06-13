@@ -1,14 +1,15 @@
 import os
-import cv2
+import cv2  # Still needed for compatibility elsewhere
 import time
-import base64
-import datetime
+import base64  # Still needed for compatibility elsewhere
+import datetime  # Still needed for compatibility elsewhere
 import json
 import argparse
 import sys
 from openai import OpenAI
 import keyboard
 import pygame
+import image_capture
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description='Interactive Game Coach')
@@ -31,6 +32,9 @@ client = OpenAI(api_key="REMOVED_KEY")
 pygame.init()
 pygame.mixer.init()
 
+# Create an ImageCapture instance
+image_capturer = image_capture.ImageCapture(stream_url, output_dir)
+
 # Key mappings for different gaming coach prompts
 KEY_PROMPTS = {
     "space": f"{args.game_name}: Describe what we see here in detail and explain all game mechanics that are important.",
@@ -47,27 +51,11 @@ def ensure_dirs():
 
 def capture_image():
     """Capture an image from the configured video stream"""
-    print("📸 Capturing image from stream...")
-    
-    cap = cv2.VideoCapture(stream_url)
-    ret, frame = cap.read()
-    cap.release()
-    
-    if not ret:
-        print("❌ Failed to grab frame from video feed")
-        return None
-    
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = os.path.join(output_dir, f"capture_{timestamp}.jpg")
-    cv2.imwrite(filename, frame)
-    print(f"✅ Frame captured and saved as '{filename}'")
-    
-    return filename
+    return image_capturer.capture()
 
 def encode_image(image_path):
     """Encode an image to base64 for API transmission"""
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode("utf-8")
+    return image_capture.encode_image_to_base64(image_path)
 
 def analyze_image(image_path, question):
     """Send an image to OpenAI's API for analysis"""
