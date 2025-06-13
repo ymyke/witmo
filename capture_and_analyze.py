@@ -8,7 +8,7 @@ import argparse
 import sys
 from openai import OpenAI
 import keyboard
-import vlc
+import pygame
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description='Interactive Game Coach')
@@ -27,18 +27,16 @@ history_file = os.path.join(output_dir, "history.json")
 # Initialize the OpenAI client
 client = OpenAI(api_key="REMOVED_KEY")
 
+# Initialize pygame for audio playback
+pygame.init()
+pygame.mixer.init()
+
 # Key mappings for different gaming coach prompts
 KEY_PROMPTS = {
-    "space": f"What's happening in {args.game_name} right now? Provide a quick overview.",
-    "s": f"What strategy should I use in this situation in {args.game_name}?",
-    "o": f"What are my objectives or goals at this point in {args.game_name}?",
-    "t": f"Explain the game mechanics visible on screen in {args.game_name}.",
-    "i": f"Identify any items, weapons, or resources I should collect in {args.game_name}.",
-    "e": f"What enemies or obstacles am I facing in {args.game_name} and how should I approach them?",
-    "h": f"Any hints or tips for this section of {args.game_name}?",
-    "p": f"What's the optimal path or approach from here in {args.game_name}?",
-    "c": f"Explain the controls or commands I should use in {args.game_name} for this situation.",
-    "d": f"Debug what I'm doing wrong in {args.game_name} and suggest improvements."
+    "space": f"{args.game_name}: Describe what we see here in detail and explain all game mechanics that are important.",
+"m": f"{args.game_name}: What are things I definitely must not have missed in the part of the map I am now?",
+"f": f"{args.game_name}: What are some reasonable things to do next from here in the map/game?",
+"s": f"{args.game_name}: Explain the numbers and stats we see here in detail. Is this a better weapon or item than what I currently have?",
 }
 
 def ensure_dirs():
@@ -83,7 +81,7 @@ Your job is to analyze gameplay images and provide helpful, concise advice.
 Focus ONLY on what's happening in the game.
 Format your responses in short, clear paragraphs.
 Be specific and actionable - tell the player exactly what to do next.
-Limit your response to 2-3 paragraphs maximum."""
+"""
         
         # Encode the image
         base64_image = encode_image(image_path)
@@ -126,7 +124,7 @@ Limit your response to 2-3 paragraphs maximum."""
         return f"Error analyzing image: {str(e)}"
 
 def speak_text(text, voice="echo"):
-    """Convert text to speech using OpenAI's TTS API and play it"""
+    """Convert text to speech using OpenAI's TTS API and play it using pygame"""
     print(f"🔊 Converting text to speech using voice: {voice}...")
     
     # Create a speech file from the text
@@ -141,15 +139,22 @@ def speak_text(text, voice="echo"):
         response.write_to_file(speech_file_path)
         print(f"✅ Speech saved to {speech_file_path}")
         
-        # Play the audio file using command line
+        # Play the audio file using pygame
         print(f"🔊 Playing audio response...")
+        
+        # Initialize pygame mixer if not already initialized
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+        
+        # Load and play the audio file
+        pygame.mixer.music.load(speech_file_path)
+        pygame.mixer.music.play()
         
         # Estimate speech duration based on word count (rough approximation)
         words = len(text.split())
         wait_time = max(3, min(30, words * 0.5))  # At least 3 seconds, at most 30
         
-        # Use os.system instead of VLC module to avoid errors
-        os.system(f'start {speech_file_path}')
+        # Wait for the audio to finish playing
         time.sleep(wait_time)
         
         return speech_file_path
