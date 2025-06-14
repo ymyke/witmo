@@ -5,57 +5,15 @@ import sys
 from openai import OpenAI
 import adb_camera
 
-# Parse command-line arguments
-parser = argparse.ArgumentParser(description="Witmo - Game Assistant without Voice")
-parser.add_argument(
-    "game_name",
-    nargs="?",
-    default="Unspecified Game",
-    help="Name of the game being played",
-)
-parser.add_argument(
-    "-i", help="Path to an initial image to analyze instead of capturing one"
-)
-parser.add_argument(
-    "-d",
-    action="store_true",
-    dest="delete_remote",
-    default=False,
-    help="Delete the remote image after capturing",
-)
-args = parser.parse_args()
-
-# --- CONFIG ---
-# Create game-specific output directory
-game_name_safe = args.game_name.replace(" ", "_").lower()
-output_dir = os.path.join("history", game_name_safe)
-history_file = os.path.join(output_dir, "chat_history.json")
-
-# Initialize the OpenAI client
-client = OpenAI(api_key="REMOVED_KEY")
-# FIXME remove key
-
-# Chat context to maintain conversation history
-chat_context = []
-
-# Create an ADB camera instance
-camera = adb_camera.AdbCamera(args.delete_remote, output_dir)
-
-SYSTEM_PROMPT = f"""You are an expert gaming assistant for {args.game_name}. 
-Your job is to analyze gameplay images and provide helpful, concise advice.
-Focus ONLY on what's happening in the game.
-Be specific and actionable, clear and concise. 
-Never just read what you see on the screen, assume that the user can read it themselves.
-"""
+# global variables TODO
+history_file: str
+client: OpenAI
+chat_context: list = []
+SYSTEM_PROMPT: str
 
 
 def ensure_dirs():
     """Ensure required directories exist"""
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-        print(f"Created directory: {output_dir}")
-    # Also update the camera's output directory
-    camera.set_output_dir(output_dir)
 
 
 def analyze_image(image_path, question):
@@ -256,8 +214,8 @@ def load_chat_history():
         chat_context = []
 
 
-def main():
-    """Main program flow"""
+def main(args: argparse.Namespace) -> None:
+
     print("\n" + "=" * 60)
     print("🎮 WITMO - GAMING ASSISTANT 🎮".center(60))
     print("=" * 60)
@@ -267,10 +225,29 @@ def main():
     print("• Conversation history is maintained for context")
     print("-" * 60)
 
-    ensure_dirs()
+    global client, history_file, SYSTEM_PROMPT
+    game_name_safe = args.game_name.replace(" ", "_").lower()
+    output_dir = os.path.join("history", game_name_safe)
+    history_file = os.path.join(output_dir, "chat_history.json")
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created directory: {output_dir}")
+
+    client = OpenAI(api_key="REMOVED_KEY")
+    # TODO remove this key
+
+    SYSTEM_PROMPT = f"""\
+You are an expert gaming assistant for {args.game_name}. 
+Your job is to analyze gameplay images and provide helpful, concise advice.
+Focus ONLY on what's happening in the game.
+Be specific and actionable, clear and concise. 
+Never just read what you see on the screen, assume that the user can read it themselves.
+"""
+
     load_chat_history()
 
-    # Keep the device screen on during the session
+    camera = adb_camera.AdbCamera(args.delete_remote, output_dir)
     camera.keep_screen_on(True)
     camera.set_brightness(0)
 
@@ -297,22 +274,42 @@ def main():
     print("\n👋 Thanks for using Witmo!")
 
 
-def display_example_usage():
-    """Display example usage information"""
-    print("\nExample Usage:")
-    print("-------------")
-    print('python witmo.py "Elden Ring"')
-    print("python witmo.py Minecraft")
-    print('python witmo.py "Call of Duty: Warzone"')
-    print('python witmo.py "Elden Ring" -i captures/elden_ring/cap_20250612_215322.jpg')
-    print("\nConnect your Android device via USB with ADB debugging enabled")
-    print("Use -i to analyze an existing image instead of capturing one")
-
-
 if __name__ == "__main__":
-    if len(sys.argv) == 1 or args.game_name == "Unspecified Game":
-        print("\n⚠️ No game name provided. Please specify the game name.")
-        display_example_usage()
+    # Do all the argument parsing here:
+    help_epilog = """\
+example Usage:
+python witmo.py "Baldur's Gate 3"
+python witmo.py "Elden Ring" -d -i myowncapture.jpg
+
+prerequisites:
+Connect your Android device via USB with ADB debugging enabled. Have your
+camera app open and top of screen on the device.
+"""
+    parser = argparse.ArgumentParser(
+        prog="witmo.py",
+        description="Witmo — your AI gaming assistant",
+        epilog=help_epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "game_name",
+        help="name of the game being played",
+    )
+    parser.add_argument(
+        "-i",
+        dest="initial_image",
+        help="path to an initial image to analyze instead of capturing one",
+    )
+    parser.add_argument(
+        "-d",
+        dest="delete_remote",
+        action="store_true",
+        help="delete the image on the camera device after capturing",
+    )
+
+    if len(sys.argv) == 1:
+        parser.print_help()
         sys.exit(1)
 
-    main()
+    args = parser.parse_args()
+    main(args)
