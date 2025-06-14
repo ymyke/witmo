@@ -4,6 +4,9 @@ Simple ADB camera module for Witmo
 This module provides a straightforward implementation of camera capture
 via ADB over USB, with no abstractions or inheritance.
 
+This class is also a context manager, ensuring the device's screen stays on and
+brightness is managed during image capture.
+
 To set up adb:
 1. Enable USB debugging in developer options
 2. Connect your Android device via USB (default mode)
@@ -44,6 +47,8 @@ class AdbCamera:
         self.device = self._get_device()
         print(f"Connected to device: {self.device.serial}")
 
+        self._original_brightness = None
+
     def _get_device(self):
         """Get the connected ADB device
 
@@ -62,6 +67,15 @@ class AdbCamera:
 
         device = devices[0]
         return device
+
+    def get_brightness(self) -> int:
+        """Get the current screen brightness from the device."""
+        try:
+            output = self.device.shell("settings get system screen_brightness").strip()
+            return int(output)
+        except Exception as e:
+            print(f"Error getting brightness: {str(e)}")
+            return 255  # Default to max brightness if unable to get value
 
     def set_brightness(self, level: int) -> None:
         """Set the device screen brightness
@@ -149,12 +163,16 @@ class AdbCamera:
 
     def __enter__(self):
         self.keep_screen_on(True)
+        self._original_brightness = self.get_brightness()
         self.set_brightness(0)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.keep_screen_on(False)
-        self.set_brightness(255)
+        if self._original_brightness is not None:
+            self.set_brightness(self._original_brightness)
+        else:
+            self.set_brightness(255)
         return False
 
 
