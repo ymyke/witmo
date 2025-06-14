@@ -251,7 +251,6 @@ Never just read what you see on the screen, assume that the user can read it the
     image = args.i or ""
     while True:
         if not image:
-            # wait for nonblocking input:
             key = input("\nPress Enter to capture a new image or type 'q' to quit: ")
             # TODO switch to non-blocking input
             if key == "q":
