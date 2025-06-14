@@ -6,7 +6,7 @@ from image import Image
 class TestCamera:
     """A simple test camera that returns a random image from the output_dir on capture."""
 
-    def __init__(self, output_dir="captures"):
+    def __init__(self, do_delete_remote: bool = False, output_dir="captures"):
         self.output_dir = output_dir
         if not os.path.exists(self.output_dir):
             raise ValueError(f"Output directory does not exist: {self.output_dir}")
