@@ -13,6 +13,7 @@ llm_client: LLMClient
 chat_context: list = []
 SYSTEM_PROMPT: str
 
+# TODO rename functions?
 
 def get_ai_completion(question: str, image: Image | None = None) -> str:
     """
