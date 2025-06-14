@@ -1,6 +1,7 @@
 import os
 import random
 from image import Image
+from loguru import logger
 
 
 class TestCamera:
@@ -19,8 +20,10 @@ class TestCamera:
             and os.path.isfile(os.path.join(self.output_dir, f))
         ]
         if not images:
+            logger.error(f"No images found in {self.output_dir}")
             raise RuntimeError(f"No images found in {self.output_dir}")
         chosen = random.choice(images)
+        logger.info(f"Selected test image: {chosen}")
         return Image(os.path.join(self.output_dir, chosen))
 
     def __enter__(self):
@@ -48,4 +51,4 @@ if __name__ == "__main__":
 
     with TestCamera(args.output) as camera:
         image = camera.capture()
-        print(f"Test image selected: {image.path}")
+        logger.info(f"Test image selected: {image.path}")

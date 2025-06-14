@@ -4,6 +4,7 @@ import argparse
 import sys
 from openai import OpenAI
 from image import Image
+from loguru import logger
 
 # global variables TODO
 history_file: str
@@ -13,9 +14,8 @@ SYSTEM_PROMPT: str
 
 
 def analyze_image(image: Image, question):
-    """Send an image to OpenAI's API for analysis"""
-    print(f"Sending image to llm...")
-    print(f"Analysis request: {question}")
+    logger.info(f"Sending image to llm...")
+    logger.info(f"Analysis request: {question}")
 
     try:
         # Create a detailed prompt for gaming assistant
@@ -82,7 +82,7 @@ def analyze_image(image: Image, question):
         return analysis
 
     except Exception as e:
-        print(f"❌ Error communicating with OpenAI API: {str(e)}")
+        logger.error(f"Error communicating with OpenAI API: {str(e)}")
         return f"Error analyzing image: {str(e)}"
 
 
@@ -167,9 +167,9 @@ def chat_with_ai(initial_image: Image, initial_prompt: str):
             print("-" * 60)
 
         except Exception as e:
-            print(f"❌ Error in chat: {str(e)}")
+            logger.error(f"Error in chat: {str(e)}")
             ai_response = "Sorry, I encountered a problem processing your request. Can you try again?"
-            print(ai_response)
+            logger.error(ai_response)
 
 
 def save_chat_history():
@@ -177,9 +177,9 @@ def save_chat_history():
     try:
         with open(history_file, "w", encoding="utf-8") as f:
             json.dump(chat_context, f, indent=2, ensure_ascii=False)
-        print(f"✅ Chat history saved to {history_file}")
+        logger.success(f"Chat history saved to {history_file}")
     except Exception as e:
-        print(f"❌ Error saving chat history: {str(e)}")
+        logger.error(f"Error saving chat history: {str(e)}")
 
 
 def load_chat_history():
@@ -229,7 +229,7 @@ def main(args: argparse.Namespace) -> None:
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-        print(f"Created directory: {output_dir}")
+        logger.info(f"Created directory: {output_dir}")
 
     client = OpenAI(api_key="REMOVED_KEY")
     # TODO remove this key
@@ -246,7 +246,7 @@ Never just read what you see on the screen, assume that the user can read it the
 
     # Camera selection logic:
     if args.test_camera:
-        print("Using TestCamera for local testing. No ADB connection required.")
+        logger.info("Using TestCamera for local testing. No ADB connection required.")
         from test_camera import TestCamera
 
         camera_class = TestCamera
@@ -323,10 +323,20 @@ camera app open and top of screen on the device.
         default=False,
         help="use test camera",
     )
+    parser.add_argument(
+        "-l",
+        "--log-level",
+        dest="log_level",
+        default="INFO",
+        choices=["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"],
+        help="set loguru log level (default: INFO)",
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
 
     args = parser.parse_args()
+    logger.remove()
+    logger.add(sys.stderr, level=args.log_level)
     main(args)

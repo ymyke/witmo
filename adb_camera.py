@@ -12,12 +12,11 @@ To set up adb:
 2. Connect your Android device via USB (default mode)
 """
 
-# TODO some of the prints here should be logging statements
-
 import os
 import time
 from ppadb.client import Client as AdbClient
 from image import Image
+from loguru import logger
 
 
 class CameraError(Exception):
@@ -41,11 +40,11 @@ class AdbCamera:
         self.output_dir = output_dir
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-            print(f"Created directory: {self.output_dir}")
+            logger.info(f"Created directory: {self.output_dir}")
 
         self.client = AdbClient(host="127.0.0.1", port=5037)
         self.device = self._get_device()
-        print(f"Connected to device: {self.device.serial}")
+        logger.info(f"Connected to device: {self.device.serial}")
 
         self._original_brightness = None
 
@@ -74,7 +73,7 @@ class AdbCamera:
             output = self.device.shell("settings get system screen_brightness").strip()
             return int(output)
         except Exception as e:
-            print(f"Error getting brightness: {str(e)}")
+            logger.error(f"Error getting brightness: {str(e)}")
             return 255  # Default to max brightness if unable to get value
 
     def set_brightness(self, level: int) -> None:
@@ -87,10 +86,10 @@ class AdbCamera:
             raise ValueError("Brightness level must be between 0 and 255")
 
         try:
-            print(f"Setting screen brightness to {level}...")
+            logger.info(f"Setting screen brightness to {level}...")
             self.device.shell(f"settings put system screen_brightness {level}")
         except Exception as e:
-            print(f"Error setting brightness: {str(e)}")
+            logger.error(f"Error setting brightness: {str(e)}")
 
     def keep_screen_on(self, enable=True) -> None:
         """Keep the screen on while connected via USB
@@ -100,13 +99,13 @@ class AdbCamera:
         """
         try:
             if enable:
-                print("🔓 Keeping device screen on...")
+                logger.info("🔓 Keeping device screen on...")
                 self.device.shell("svc power stayon usb")
             else:
-                print("🔒 Restoring normal screen timeout...")
+                logger.info("🔒 Restoring normal screen timeout...")
                 self.device.shell("svc power stayon false")
         except Exception as e:
-            print(f"Error changing screen timeout: {str(e)}")
+            logger.error(f"Error changing screen timeout: {str(e)}")
 
     def get_latest_image_path(self) -> str:
         """Get the most recent image from the device's camera
@@ -129,7 +128,7 @@ class AdbCamera:
 
     def capture(self) -> Image:
         """Capture an image using the device's camera and return an Image object."""
-        print("📸 Taking photo...")
+        logger.info("📸 Taking photo...")
 
         self.assert_running()
 
@@ -149,16 +148,16 @@ class AdbCamera:
                     "Timed out waiting for camera to save image. Please ensure the camera app is functioning."
                 )
 
-        print(f"Found recent image at {latest_image}")
-        print(f"Transferring image to local machine...")
+        logger.info(f"Found recent image at {latest_image}")
+        logger.info(f"Transferring image to local machine...")
         local_image = Image.create_with_timestamp(self.output_dir)
         self.device.pull(latest_image, local_image.path)
 
         if self.do_delete_remote:
-            print("Removing image from device...")
+            logger.info("Removing image from device...")
             self.device.shell(f"rm '{latest_image}'")
 
-        print(f"Image saved to {local_image.path}")
+        logger.info(f"Image saved to {local_image.path}")
         return local_image
 
     def __enter__(self):

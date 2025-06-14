@@ -4,6 +4,7 @@ import base64
 import threading
 import cv2
 import os
+from loguru import logger
 
 
 class Image:
@@ -27,7 +28,7 @@ class Image:
 
         def _show():
             try:
-                print(f"[DEBUG] Attempting to show image: {self.path}")
+                logger.debug(f"Attempting to show image: {self.path}")
                 img = cv2.imread(self.path)
 
                 # Scale:
@@ -39,8 +40,8 @@ class Image:
                 else:
                     win_w, win_h = w, h
 
-                print(
-                    f"[DEBUG] Image loaded. Displaying window at {win_w}x{win_h}, image is {w}x{h}."
+                logger.debug(
+                    f"Image loaded. Displaying window at {win_w}x{win_h}, image is {w}x{h}."
                 )
 
                 # Show & wait:
@@ -50,16 +51,14 @@ class Image:
                 try:
                     cv2.setWindowProperty("Witmo Capture", cv2.WND_PROP_TOPMOST, 1)
                 except Exception as e:
-                    print(f"[DEBUG] Could not set window as topmost: {e}")
+                    logger.debug(f"Could not set window as topmost: {e}")
                 cv2.waitKey(1)
-                print(
-                    f"[DEBUG] Image window should now be visible for {seconds} seconds."
-                )
+                logger.debug(f"Image window should now be visible for {seconds} seconds.")
                 cv2.waitKey(seconds * 1000)
                 cv2.destroyAllWindows()
-                print(f"[DEBUG] Image window closed.")
+                logger.debug(f"Image window closed.")
             except Exception as e:
-                print(f"⚠️ Could not display image: {e}")
+                logger.warning(f"Could not display image: {e}")
 
         threading.Thread(target=_show, daemon=True).start()
 
