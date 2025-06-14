@@ -12,9 +12,6 @@ chat_context: list = []
 SYSTEM_PROMPT: str
 
 
-def ensure_dirs():
-    """Ensure required directories exist"""
-
 
 def analyze_image(image_path, question):
     """Send an image to OpenAI's API for analysis"""
