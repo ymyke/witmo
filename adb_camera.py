@@ -68,6 +68,21 @@ class AdbCamera:
         self.output_dir = directory
         self.ensure_output_dir()
 
+    def set_brightness(self, level: int) -> None:
+        """Set the device screen brightness
+
+        Args:
+            level (int): Brightness level (0-255)
+        """
+        if not (0 <= level <= 255):
+            raise ValueError("Brightness level must be between 0 and 255")
+
+        try:
+            print(f"Setting screen brightness to {level}...")
+            self.device.shell(f"settings put system screen_brightness {level}")
+        except Exception as e:
+            print(f"Error setting brightness: {str(e)}")
+
     def keep_screen_on(self, enable=True) -> None:
         """Keep the screen on while connected via USB
 
