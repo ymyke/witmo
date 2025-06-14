@@ -224,7 +224,7 @@ def main(args: argparse.Namespace) -> None:
 
     global client, history_file, SYSTEM_PROMPT
     game_name_safe = args.game_name.replace(" ", "_").lower()
-    output_dir = os.path.join("history", game_name_safe) # TODO add -o switch?
+    output_dir = os.path.join("history", game_name_safe)  # TODO add -o switch?
     history_file = os.path.join(output_dir, "chat_history.json")
 
     if not os.path.exists(output_dir):
@@ -266,6 +266,8 @@ Never just read what you see on the screen, assume that the user can read it the
                 if key == "q":
                     break
                 image = camera.capture()
+
+            image.preview()
 
             # TODO do proper prompt selection here
             prompt = f"{args.game_name}: Describe what we see here and help me understand what's happening. Do not just read out what is there. I can read the screen myself. Focus on giving me insights, help me understand, provide truly useful information."
