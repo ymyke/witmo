@@ -36,7 +36,7 @@ class AdbCamera:
         if not output_dir:
             raise ValueError("Output directory must be specified")
         self.output_dir = output_dir
-        if os.path.exists(self.output_dir):
+        if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
             print(f"Created directory: {self.output_dir}")
 
