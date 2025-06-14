@@ -1,5 +1,7 @@
 .venv/
-yolo*.pt
 adb/
 game_coach_captures/
+history/
+
+yolo*.pt
 *.pyc
