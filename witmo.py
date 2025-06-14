@@ -5,9 +5,11 @@ from loguru import logger
 from openai import OpenAI
 from image import Image
 from history import History
+from llm_client import LLMClient
 
 # global variables TODO
 client: OpenAI
+llm_client: LLMClient
 chat_context: list = []
 SYSTEM_PROMPT: str
 
@@ -19,13 +21,10 @@ def analyze_image(image: Image, question):
     system_message = SYSTEM_PROMPT
     messages = [{"role": "system", "content": system_message}]
 
-    # Add chat history for context (limited to last 10 messages)
     for msg in history.last(10):
-        # For image analysis, allow both string and list content
         if isinstance(msg.get("content"), (str, list)):
             messages.append(msg)
 
-    # Add the current question with image
     user_message = {
         "role": "user",
         "content": [
@@ -37,20 +36,13 @@ def analyze_image(image: Image, question):
         ],
     }
     messages.append(user_message)
-    # Send request to OpenAI's API
-    response = client.chat.completions.create(  # type: ignore
-        model="o3",
-        messages=messages,  # This is valid for vision models
-    )
-
-    # Extract the analysis
-    analysis = response.choices[0].message.content
+    # Use LLMClient for OpenAI call
+    analysis = llm_client.chat_completion(messages)
     print("\n✅ Analysis from AI Assistant:")
     print("=" * 50)
     print(analysis)
     print("=" * 50)
 
-    # Update chat context
     history.append(user_message)
     history.append({"role": "assistant", "content": analysis})
 
@@ -76,48 +68,19 @@ def chat_with_ai(initial_image: Image, initial_prompt: str):
             print("👋 Ending chat session.")
             break
 
-        # TODO necessary?
-        # # Check for capture command
-        # if user_input.lower() == "capture":
-        #     print("🔄 Capturing new gameplay image...")
-        #     new_image_path = capture_image()
-
-        #     if new_image_path:
-        #         follow_up = input(
-        #             "\n❓ What would you like to know about this gameplay moment? "
-        #         )
-        #         if not follow_up.strip():
-        #             follow_up = "Describe what we see here and help me understand what's happening."
-
-        #         # Analyze the new image
-        #         response = analyze_image(new_image_path, follow_up)
-        #         continue
-        #     else:
-        #         print(
-        #             "❌ Failed to capture new image. Continuing chat with previous context."
-        #         )
-        #         continue
-
         # Normal chat interaction - no image for this message
         print(f"💬 Sending message to AI assistant...")
 
         system_message = SYSTEM_PROMPT
         messages = [{"role": "system", "content": system_message}]
 
-        # Only add text messages (content as str)
         for msg in history.last(10):
             if isinstance(msg.get("content"), str):
                 messages.append(msg)
 
         user_message = {"role": "user", "content": user_input}
         messages.append(user_message)
-        response = client.chat.completions.create(  # type: ignore
-            model="o3",
-            messages=messages,  # For text chat, all content is str
-        )
-
-        ai_response = response.choices[0].message.content
-
+        ai_response = llm_client.chat_completion(messages)
         history.append(user_message)
         history.append({"role": "assistant", "content": ai_response})
 
@@ -127,9 +90,9 @@ def chat_with_ai(initial_image: Image, initial_prompt: str):
         print("-" * 60)
 
 
-
 def save_chat_history():
     history.save()
+
 
 def load_chat_history():
     history.load()
@@ -146,7 +109,7 @@ def main(args: argparse.Namespace) -> None:
     print("• Conversation history is maintained for context")
     print("-" * 60)
 
-    global client, SYSTEM_PROMPT, history
+    global llm_client, client, SYSTEM_PROMPT, history
     game_name_safe = args.game_name.replace(" ", "_").lower()
     output_dir = os.path.join("history", game_name_safe)
 
@@ -155,6 +118,7 @@ def main(args: argparse.Namespace) -> None:
         logger.info(f"Created directory: {output_dir}")
 
     client = OpenAI(api_key="REMOVED_KEY")
+    llm_client = LLMClient(api_key="REMOVED_KEY")
     # TODO remove this key
 
     SYSTEM_PROMPT = f"""\
