@@ -71,7 +71,7 @@ def analyze_image(image: Image, question):
                     {"type": "text", "text": question},
                     {
                         "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
+                    "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
                     },
                 ],
             }
