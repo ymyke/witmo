@@ -15,6 +15,8 @@ SYSTEM_PROMPT: str
 
 # TODO rename functions?
 
+# TODO factor function into own module called llm or sth?
+
 def get_ai_completion(question: str, image: Image | None = None) -> str:
     """
     Handles message marshalling for both text and image+text completions, calls LLM, updates history.
@@ -51,7 +53,7 @@ def get_ai_completion(question: str, image: Image | None = None) -> str:
         user_message = {"role": "user", "content": question}
 
     messages.append(user_message)
-    ai_response = llm_client.chat_completion(messages)
+    ai_response = llm_client.chat_completion(messages)  # TODO re-refactor into here?
 
     # Update history:
     history.append(user_message)
