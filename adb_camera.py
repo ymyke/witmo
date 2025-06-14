@@ -147,6 +147,16 @@ class AdbCamera:
         print(f"Image saved to {local_image.path}")
         return local_image
 
+    def __enter__(self):
+        self.keep_screen_on(True)
+        self.set_brightness(0)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.keep_screen_on(False)
+        self.set_brightness(255)
+        return False
+
 
 if __name__ == "__main__":
     import argparse
@@ -170,10 +180,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    camera = AdbCamera(args.delete_remote, args.output)
-    camera.keep_screen_on(True)
-
-    image = camera.capture()
-    print(f"Image captured: {image.path}")
-
-    camera.keep_screen_on(False)
+    with AdbCamera(args.delete_remote, args.output) as camera:
+        image = camera.capture()
+        print(f"Image captured: {image.path}")
