@@ -327,9 +327,9 @@ camera app open and top of screen on the device.
         "-l",
         "--log-level",
         dest="log_level",
-        default="INFO",
+        default="ERROR",
         choices=["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"],
-        help="set loguru log level (default: INFO)",
+        help="set loguru log level (default: ERROR)",
     )
 
     if len(sys.argv) == 1:
