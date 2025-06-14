@@ -17,73 +17,65 @@ def analyze_image(image: Image, question):
     logger.info(f"Sending image to llm...")
     logger.info(f"Analysis request: {question}")
 
-    try:
-        # Create a detailed prompt for gaming assistant
-        system_message = SYSTEM_PROMPT
-        messages = [{"role": "system", "content": system_message}]
+    system_message = SYSTEM_PROMPT
+    messages = [{"role": "system", "content": system_message}]
 
-        # Add chat history for context (limited to last 10 messages)
-        for msg in chat_context[-10:]:
-            # If the message is a vision/image message, keep as is
+    # Add chat history for context (limited to last 10 messages)
+    for msg in chat_context[-10:]:
+        # If the message is a vision/image message, keep as is
 
-            # TODO so this works with both text and image messages?
-            if isinstance(msg.get("content"), list):
-                messages.append(msg)
-            else:
-                # Otherwise, ensure content is a string
-                messages.append({"role": msg["role"], "content": msg["content"]})
+        # TODO so this works with both text and image messages?
+        if isinstance(msg.get("content"), list):
+            messages.append(msg)
+        else:
+            # Otherwise, ensure content is a string
+            messages.append({"role": msg["role"], "content": msg["content"]})
 
-        # Add the current question with image
-        messages.append(
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": question},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{image.to_base64()}"
-                        },
-                    },
-                ],
-            }
-        )
-        # Send request to OpenAI's API
-        # Convert message format to what OpenAI expects
-        response = client.chat.completions.create(
-            model="o3",
-            messages=messages,
-            # max_tokens=1000,
-        )
-
-        # Extract the analysis
-        analysis = response.choices[0].message.content
-        print("\n✅ Analysis from AI Assistant:")
-        print("=" * 50)
-        print(analysis)
-        print("=" * 50)
-
-        # Update chat context
-        chat_context.append(
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": question},
-                    {
-                        "type": "image_url",
+    # Add the current question with image
+    messages.append(
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": question},
+                {
+                    "type": "image_url",
                     "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
-                    },
-                ],
-            }
-        )
+                },
+            ],
+        }
+    )
+    # Send request to OpenAI's API
+    # Convert message format to what OpenAI expects
+    response = client.chat.completions.create(
+        model="o3",
+        messages=messages,
+        # max_tokens=1000,
+    )
 
-        chat_context.append({"role": "assistant", "content": analysis})
+    # Extract the analysis
+    analysis = response.choices[0].message.content
+    print("\n✅ Analysis from AI Assistant:")
+    print("=" * 50)
+    print(analysis)
+    print("=" * 50)
 
-        return analysis
+    # Update chat context
+    chat_context.append(
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": question},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
+                },
+            ],
+        }
+    )
 
-    except Exception as e:
-        logger.error(f"Error communicating with OpenAI API: {str(e)}")
-        return f"Error analyzing image: {str(e)}"
+    chat_context.append({"role": "assistant", "content": analysis})
+
+    return analysis
 
 
 def chat_with_ai(initial_image: Image, initial_prompt: str):
@@ -132,44 +124,39 @@ def chat_with_ai(initial_image: Image, initial_prompt: str):
         # Normal chat interaction - no image for this message
         print(f"💬 Sending message to AI assistant...")
 
-        try:
-            system_message = SYSTEM_PROMPT
-            messages = [{"role": "system", "content": system_message}]
+        system_message = SYSTEM_PROMPT
+        messages = [{"role": "system", "content": system_message}]
 
-            # Add chat history (limited to last 10 messages)
-            for msg in chat_context[-10:]:
-                # Only add text messages (not vision/image messages)
-                if isinstance(msg.get("content"), str):
-                    messages.append({"role": msg["role"], "content": msg["content"]})
+        # Add chat history (limited to last 10 messages)
+        for msg in chat_context[-10:]:
+            # Only add text messages (not vision/image messages)
+            if isinstance(msg.get("content"), str):
+                messages.append({"role": msg["role"], "content": msg["content"]})
 
-            # Add the current question
-            user_message = {"role": "user", "content": user_input}
-            messages.append(user_message)
-            # Send request to OpenAI's API
-            # Convert message format to what OpenAI expects
-            response = client.chat.completions.create(
-                model="o3",
-                messages=messages,
-                # max_tokens=1000,
-            )
+        # Add the current question
+        user_message = {"role": "user", "content": user_input}
+        messages.append(user_message)
+        # Send request to OpenAI's API
+        # Convert message format to what OpenAI expects
+        response = client.chat.completions.create(
+            model="o3",
+            messages=messages,
+            # max_tokens=1000,
+        )
 
-            # Extract the response
-            ai_response = response.choices[0].message.content
+        # Extract the response
+        ai_response = response.choices[0].message.content
 
-            # Update chat context
-            chat_context.append(user_message)
-            chat_context.append({"role": "assistant", "content": ai_response})
+        # Update chat context
+        chat_context.append(user_message)
+        chat_context.append({"role": "assistant", "content": ai_response})
 
-            # Display the response
-            print("\n✅ AI Assistant:")
-            print("-" * 60)
-            print(ai_response)
-            print("-" * 60)
+        # Display the response
+        print("\n✅ AI Assistant:")
+        print("-" * 60)
+        print(ai_response)
+        print("-" * 60)
 
-        except Exception as e:
-            logger.error(f"Error in chat: {str(e)}")
-            ai_response = "Sorry, I encountered a problem processing your request. Can you try again?"
-            logger.error(ai_response)
 
 
 def save_chat_history():
