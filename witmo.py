@@ -4,6 +4,7 @@ import argparse
 import sys
 from openai import OpenAI
 import adb_camera
+from image import Image
 
 # global variables TODO
 history_file: str
@@ -13,7 +14,7 @@ SYSTEM_PROMPT: str
 
 
 
-def analyze_image(image_path, question):
+def analyze_image(image: Image, question):
     """Send an image to OpenAI's API for analysis"""
     print(f"Sending image to llm...")
     print(f"Analysis request: {question}")
@@ -21,7 +22,6 @@ def analyze_image(image_path, question):
     try:
         # Create a detailed prompt for gaming assistant
         system_message = SYSTEM_PROMPT
-        base64_image = adb_camera.encode_image_to_base64(image_path)
         messages = [{"role": "system", "content": system_message}]
 
         # Add chat history for context (limited to last 10 messages)
@@ -43,7 +43,7 @@ def analyze_image(image_path, question):
                     {"type": "text", "text": question},
                     {
                         "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
+                        "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
                     },
                 ],
             }
@@ -86,7 +86,7 @@ def analyze_image(image_path, question):
         return f"Error analyzing image: {str(e)}"
 
 
-def chat_with_ai(initial_image_path, initial_prompt: str):
+def chat_with_ai(initial_image: Image, initial_prompt: str):
     """Start an interactive chat session with the AI assistant (text only)"""
     global chat_context
 
@@ -98,7 +98,7 @@ def chat_with_ai(initial_image_path, initial_prompt: str):
     print("• Type your questions or messages normally")
     print("-" * 60)
 
-    response = analyze_image(initial_image_path, initial_prompt)
+    response = analyze_image(initial_image, initial_prompt)
     while True:
         user_input = input("\n💬 Your message: ")
 
@@ -248,7 +248,7 @@ Never just read what you see on the screen, assume that the user can read it the
     camera.keep_screen_on(True)
     camera.set_brightness(0)
 
-    image = args.i or ""
+    image = Image(args.i) or None
     while True:
         if not image:
             key = input("\nPress Enter to capture a new image or type 'q' to quit: ")
@@ -261,7 +261,7 @@ Never just read what you see on the screen, assume that the user can read it the
         prompt = f"{args.game_name}: Describe what we see here and help me understand what's happening. Do not just read out what is there. I can read the screen myself. Focus on giving me insights, help me understand, provide truly useful information."
         chat_with_ai(image, prompt)
 
-        image = ""
+        image = None
 
     print("\n🔄 Saving chat history...")
     save_chat_history()  # TODO does this work?
@@ -293,11 +293,13 @@ camera app open and top of screen on the device.
     )
     parser.add_argument(
         "-i",
+        "--initial-image",
         dest="initial_image",
         help="path to an initial image to analyze instead of capturing one",
     )
     parser.add_argument(
         "-d",
+        "--delete-remote",
         dest="delete_remote",
         action="store_true",
         help="delete the image on the camera device after capturing",

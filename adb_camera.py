@@ -13,9 +13,9 @@ To set up adb:
 
 import os
 import time
-import datetime
-import base64
 from ppadb.client import Client as AdbClient
+from image import Image
+
 
 class CameraError(Exception):
     pass
@@ -113,15 +113,10 @@ class AdbCamera:
                 "Camera app is not running. Please open the camera app on your device."
             )
 
-
-    def capture(self) -> str:
-        """Capture an image using the device's camera
-
-        Returns:
-            str: Path to the captured image file
-        """
+    def capture(self) -> Image:
+        """Capture an image using the device's camera and return an Image object."""
         print("📸 Taking photo...")
-        
+
         self.assert_running()
 
         latest_image_before = self.get_latest_image_path()
@@ -135,42 +130,22 @@ class AdbCamera:
             if latest_image != latest_image_before:
                 break
             i += 1
-            if i > 20/0.05:
+            if i > 20 / 0.05:
                 raise CameraError(
                     "Timed out waiting for camera to save image. Please ensure the camera app is functioning."
                 )
 
         print(f"Found recent image at {latest_image}")
         print(f"Transferring image to local machine...")
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        local_filename = os.path.join(self.output_dir, f"cap_{timestamp}.jpg")
-        self.device.pull(latest_image, local_filename)
+        local_image = Image.create_with_timestamp(self.output_dir)
+        self.device.pull(latest_image, local_image.path)
 
         if self.do_delete_remote:
             print("Removing image from device...")
             self.device.shell(f"rm '{latest_image}'")
 
-        print(f"Image saved to {local_filename}")
-        return local_filename
-
-    @staticmethod
-    def encode_image(image_path: str) -> str:
-        """Encode an image to base64 for API transmission
-
-        Args:
-            image_path (str): Path to the image file
-
-        Returns:
-            str: Base64-encoded image data
-        """
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode("utf-8")
-
-
-# Convenience functions for direct use
-def encode_image_to_base64(image_path: str) -> str:
-    """Encode an image to base64 for API transmission"""
-    return AdbCamera.encode_image(image_path)
+        print(f"Image saved to {local_image.path}")
+        return local_image
 
 
 if __name__ == "__main__":
@@ -198,12 +173,7 @@ if __name__ == "__main__":
     camera = AdbCamera(args.delete_remote, args.output)
     camera.keep_screen_on(True)
 
-    try:
-        image_path = camera.capture()
-        if image_path:
-            print(f"Image captured successfully: {image_path}")
-        else:
-            print("Image capture failed")
-            exit(1)
-    finally:
-        camera.keep_screen_on(False)
+    image = camera.capture()
+    print(f"Image captured: {image.path}")
+
+    camera.keep_screen_on(False)
