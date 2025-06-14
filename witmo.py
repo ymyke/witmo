@@ -14,39 +14,49 @@ chat_context: list = []
 SYSTEM_PROMPT: str
 
 
-def analyze_image(image: Image, question):
-    logger.info(f"Sending image to llm...")
-    logger.info(f"Analysis request: {question}")
+def get_ai_completion(question: str, image: Image | None = None) -> str:
+    """
+    Handles message marshalling for both text and image+text completions, calls LLM, updates history.
+    """
+    logger.info(f"Sending message to LLM... (image={'yes' if image else 'no'})")
+    logger.info(f"Request: {question}")
 
     system_message = SYSTEM_PROMPT
     messages = [{"role": "system", "content": system_message}]
 
+    # Add chat history for context:
     for msg in history.last(10):
-        if isinstance(msg.get("content"), (str, list)):
-            messages.append(msg)
+        # For image analysis, allow both string and list content
+        if image:   # TODO does this make sense? should this be done elsewhere?
+            if isinstance(msg.get("content"), (str, list)):
+                messages.append(msg)
+        else:
+            if isinstance(msg.get("content"), str):
+                messages.append(msg)
 
-    user_message = {
-        "role": "user",
-        "content": [
-            {"type": "text", "text": question},
-            {
-                "type": "image_url",
-                "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
-            },
-        ],
-    }
+    # Build user message
+    if image:
+        user_message = {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": question},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
+                },
+            ],
+        }
+    else:
+        user_message = {"role": "user", "content": question}
+
     messages.append(user_message)
-    # Use LLMClient for OpenAI call
-    analysis = llm_client.chat_completion(messages)
-    print("\n✅ Analysis from AI Assistant:")
-    print("=" * 50)
-    print(analysis)
-    print("=" * 50)
+    ai_response = llm_client.chat_completion(messages)
 
+    # Update history:
     history.append(user_message)
-    history.append({"role": "assistant", "content": analysis})
+    history.append({"role": "assistant", "content": ai_response})
 
-    return analysis
+    return ai_response
 
 
 def chat_with_ai(initial_image: Image, initial_prompt: str):
@@ -59,35 +69,25 @@ def chat_with_ai(initial_image: Image, initial_prompt: str):
     print("• Type your questions or messages normally")
     print("-" * 60)
 
-    response = analyze_image(initial_image, initial_prompt)
+    answer_pattern = """\
+Response:
+============================================================
+{response}
+============================================================
+"""
+
+    response = get_ai_completion(initial_prompt, initial_image)
+    print(answer_pattern.format(response=response))
     while True:
         user_input = input("\n💬 Your message: ")
 
-        # Check for exit commands
         if user_input.lower() in ["exit", "quit", "bye", "q"]:
             print("👋 Ending chat session.")
             break
 
-        # Normal chat interaction - no image for this message
         print(f"💬 Sending message to AI assistant...")
-
-        system_message = SYSTEM_PROMPT
-        messages = [{"role": "system", "content": system_message}]
-
-        for msg in history.last(10):
-            if isinstance(msg.get("content"), str):
-                messages.append(msg)
-
-        user_message = {"role": "user", "content": user_input}
-        messages.append(user_message)
-        ai_response = llm_client.chat_completion(messages)
-        history.append(user_message)
-        history.append({"role": "assistant", "content": ai_response})
-
-        print("\n✅ AI Assistant:")
-        print("-" * 60)
-        print(ai_response)
-        print("-" * 60)
+        response = get_ai_completion(user_input)
+        print(answer_pattern.format(response=response))
 
 
 def save_chat_history():
@@ -118,7 +118,9 @@ def main(args: argparse.Namespace) -> None:
         logger.info(f"Created directory: {output_dir}")
 
     client = OpenAI(api_key="REMOVED_KEY")
-    llm_client = LLMClient(api_key="REMOVED_KEY")
+    llm_client = LLMClient(
+        api_key="REMOVED_KEY"
+    )
     # TODO remove this key
 
     SYSTEM_PROMPT = f"""\
