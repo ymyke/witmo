@@ -244,29 +244,24 @@ Never just read what you see on the screen, assume that the user can read it the
 
     load_chat_history()
 
-    camera = adb_camera.AdbCamera(args.delete_remote, output_dir)
-    camera.keep_screen_on(True)
-    camera.set_brightness(0)
-
-    image = Image(args.i) or None
-    while True:
-        if not image:
-            key = input("\nPress Enter to capture a new image or type 'q' to quit: ")
+    with adb_camera.AdbCamera(args.delete_remote, output_dir) as camera:
+        image = Image(args.initial_image) if args.initial_image else None
+        while True:
+            if not image:
+                key = input("\nPress Enter to capture a new image or type 'q' to quit: ")
             # TODO switch to non-blocking input
-            if key == "q":
-                break
-            image = camera.capture()
+                if key == "q":
+                    break
+                image = camera.capture()
 
         # TODO do proper prompt selection here
-        prompt = f"{args.game_name}: Describe what we see here and help me understand what's happening. Do not just read out what is there. I can read the screen myself. Focus on giving me insights, help me understand, provide truly useful information."
-        chat_with_ai(image, prompt)
+            prompt = f"{args.game_name}: Describe what we see here and help me understand what's happening. Do not just read out what is there. I can read the screen myself. Focus on giving me insights, help me understand, provide truly useful information."
+            chat_with_ai(image, prompt)
 
-        image = None
+            image = None
 
     print("\n🔄 Saving chat history...")
-    save_chat_history()  # TODO does this work?
-    camera.keep_screen_on(False)
-    camera.set_brightness(1)
+    save_chat_history()
     print("\n👋 Thanks for using Witmo!")
 
 
