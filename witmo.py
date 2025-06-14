@@ -1,13 +1,12 @@
 import os
-import json
 import argparse
 import sys
+from loguru import logger
 from openai import OpenAI
 from image import Image
-from loguru import logger
+from history import History
 
 # global variables TODO
-history_file: str
 client: OpenAI
 chat_context: list = []
 SYSTEM_PROMPT: str
@@ -21,35 +20,27 @@ def analyze_image(image: Image, question):
     messages = [{"role": "system", "content": system_message}]
 
     # Add chat history for context (limited to last 10 messages)
-    for msg in chat_context[-10:]:
-        # If the message is a vision/image message, keep as is
-
-        # TODO so this works with both text and image messages?
-        if isinstance(msg.get("content"), list):
+    for msg in history.last(10):
+        # For image analysis, allow both string and list content
+        if isinstance(msg.get("content"), (str, list)):
             messages.append(msg)
-        else:
-            # Otherwise, ensure content is a string
-            messages.append({"role": msg["role"], "content": msg["content"]})
 
     # Add the current question with image
-    messages.append(
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": question},
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
-                },
-            ],
-        }
-    )
+    user_message = {
+        "role": "user",
+        "content": [
+            {"type": "text", "text": question},
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
+            },
+        ],
+    }
+    messages.append(user_message)
     # Send request to OpenAI's API
-    # Convert message format to what OpenAI expects
-    response = client.chat.completions.create(
+    response = client.chat.completions.create(  # type: ignore
         model="o3",
-        messages=messages,
-        # max_tokens=1000,
+        messages=messages,  # This is valid for vision models
     )
 
     # Extract the analysis
@@ -60,28 +51,14 @@ def analyze_image(image: Image, question):
     print("=" * 50)
 
     # Update chat context
-    chat_context.append(
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": question},
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
-                },
-            ],
-        }
-    )
-
-    chat_context.append({"role": "assistant", "content": analysis})
+    history.append(user_message)
+    history.append({"role": "assistant", "content": analysis})
 
     return analysis
 
 
 def chat_with_ai(initial_image: Image, initial_prompt: str):
     """Start an interactive chat session with the AI assistant (text only)"""
-    global chat_context
-
     print("\n" + "=" * 60)
     print("💬 STARTING INTERACTIVE CHAT SESSION 💬".center(60))
     print("=" * 60)
@@ -127,31 +104,23 @@ def chat_with_ai(initial_image: Image, initial_prompt: str):
         system_message = SYSTEM_PROMPT
         messages = [{"role": "system", "content": system_message}]
 
-        # Add chat history (limited to last 10 messages)
-        for msg in chat_context[-10:]:
-            # Only add text messages (not vision/image messages)
+        # Only add text messages (content as str)
+        for msg in history.last(10):
             if isinstance(msg.get("content"), str):
-                messages.append({"role": msg["role"], "content": msg["content"]})
+                messages.append(msg)
 
-        # Add the current question
         user_message = {"role": "user", "content": user_input}
         messages.append(user_message)
-        # Send request to OpenAI's API
-        # Convert message format to what OpenAI expects
-        response = client.chat.completions.create(
+        response = client.chat.completions.create(  # type: ignore
             model="o3",
-            messages=messages,
-            # max_tokens=1000,
+            messages=messages,  # For text chat, all content is str
         )
 
-        # Extract the response
         ai_response = response.choices[0].message.content
 
-        # Update chat context
-        chat_context.append(user_message)
-        chat_context.append({"role": "assistant", "content": ai_response})
+        history.append(user_message)
+        history.append({"role": "assistant", "content": ai_response})
 
-        # Display the response
         print("\n✅ AI Assistant:")
         print("-" * 60)
         print(ai_response)
@@ -160,42 +129,10 @@ def chat_with_ai(initial_image: Image, initial_prompt: str):
 
 
 def save_chat_history():
-    """Save the chat history to a file"""
-    try:
-        with open(history_file, "w", encoding="utf-8") as f:
-            json.dump(chat_context, f, indent=2, ensure_ascii=False)
-        logger.success(f"Chat history saved to {history_file}")
-    except Exception as e:
-        logger.error(f"Error saving chat history: {str(e)}")
-
+    history.save()
 
 def load_chat_history():
-    """Load existing chat history if available"""
-    global chat_context
-    if os.path.exists(history_file):
-        try:
-            with open(history_file, "r", encoding="utf-8") as f:
-                loaded = json.load(f)
-            # Only keep valid message dicts
-            chat_context = []
-            for msg in loaded:
-                if (
-                    isinstance(msg, dict)
-                    and "role" in msg
-                    and "content" in msg
-                    and (
-                        isinstance(msg["content"], str)
-                        or isinstance(msg["content"], list)
-                    )
-                ):
-                    chat_context.append(msg)
-            print(f"✅ Loaded existing chat history with {len(chat_context)} messages")
-        except json.JSONDecodeError:
-            print("⚠️ Chat history file was corrupted, starting with empty history")
-            chat_context = []
-    else:
-        print("ℹ️ No previous chat history found, starting fresh")
-        chat_context = []
+    history.load()
 
 
 def main(args: argparse.Namespace) -> None:
@@ -209,10 +146,9 @@ def main(args: argparse.Namespace) -> None:
     print("• Conversation history is maintained for context")
     print("-" * 60)
 
-    global client, history_file, SYSTEM_PROMPT
+    global client, SYSTEM_PROMPT, history
     game_name_safe = args.game_name.replace(" ", "_").lower()
-    output_dir = os.path.join("history", game_name_safe)  # TODO add -o switch?
-    history_file = os.path.join(output_dir, "chat_history.json")
+    output_dir = os.path.join("history", game_name_safe)
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -229,7 +165,7 @@ Be specific and actionable, clear and concise.
 Never just read what you see on the screen, assume that the user can read it themselves.
 """
 
-    load_chat_history()
+    history = History(output_dir)
 
     # Camera selection logic:
     if args.test_camera:
