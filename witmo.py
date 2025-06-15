@@ -7,6 +7,7 @@ from image import Image
 from history import History
 from llm_client import LLMClient
 from argparsing import parse
+from llm import generate_completion
 
 
 # global variables TODO
@@ -16,44 +17,6 @@ chat_context: list = []
 SYSTEM_PROMPT: str
 
 # TODO rename functions?
-
-# TODO factor function into own module called llm or sth?
-
-def get_ai_completion(question: str, image: Image | None = None) -> str:
-    """
-    Handles message marshalling for both text and image+text completions, calls LLM, updates history.
-    """
-    logger.info(f"Sending message to LLM... (image={'yes' if image else 'no'})")
-    logger.info(f"Request: {question}")
-
-    system_message = SYSTEM_PROMPT
-    messages = [{"role": "system", "content": system_message}]
-
-    messages.extend(history.last(10))
-    
-    # Build user message
-    if image:
-        user_message = {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": question},
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{image.to_base64()}"},
-                },
-            ],
-        }
-    else:
-        user_message = {"role": "user", "content": question}
-
-    messages.append(user_message)
-    ai_response = llm_client.chat_completion(messages)  # TODO re-refactor into here?
-
-    # Update history:
-    history.append(user_message)
-    history.append({"role": "assistant", "content": ai_response})
-
-    return ai_response
 
 
 def chat_with_ai(initial_image: Image, initial_prompt: str):
@@ -74,7 +37,13 @@ Response:
 """
 
     print(f"Sent. Waiting for a response...")
-    response = get_ai_completion(initial_prompt, initial_image)
+    response = generate_completion(
+        initial_prompt,
+        initial_image,
+        history=history,
+        llm_client=llm_client,
+        SYSTEM_PROMPT=SYSTEM_PROMPT,
+    )
     print(answer_pattern.format(response=response))
     while True:
         user_input = input("\n💬 Your message: ")
@@ -84,7 +53,12 @@ Response:
             break
 
         print(f"Sent. Waiting for a response...")
-        response = get_ai_completion(user_input)
+        response = generate_completion(
+            user_input,
+            history=history,
+            llm_client=llm_client,
+            SYSTEM_PROMPT=SYSTEM_PROMPT,
+        )
         print(answer_pattern.format(response=response))
 
 
