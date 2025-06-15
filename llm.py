@@ -1,6 +1,14 @@
+import os
 from loguru import logger
 from history import History
 from image import Image
+from openai import OpenAI
+
+# Set up OpenAI client:
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise RuntimeError("OPENAI_API_KEY environment variable not set.")
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 def generate_completion(
@@ -8,8 +16,8 @@ def generate_completion(
     *,
     image: Image | None = None,
     history: History | None = None,
-    llm_client,
     SYSTEM_PROMPT,
+    model: str = "o3",
 ) -> str:
     """
     Handles message marshalling for both text and image+text completions, calls LLM, updates history.
@@ -23,6 +31,7 @@ def generate_completion(
     if history:
         messages.extend(history.last(10))
 
+    # Prepare user message:
     if image:
         user_message = {
             "role": "user",
@@ -38,10 +47,19 @@ def generate_completion(
         user_message = {"role": "user", "content": question}
 
     messages.append(user_message)
-    ai_response = llm_client.chat_completion(messages)
+
+    # Call OpenAI model:
+    response = openai_client.chat.completions.create(
+        model=model,
+        messages=messages,  # type: ignore
+    )
+    content = response.choices[0].message.content
+    if not content:
+        logger.error("Received empty response from LLM.")
+        content = "<<no response>>"
 
     if history:
         history.append(user_message)
-        history.append({"role": "assistant", "content": ai_response})
+        history.append({"role": "assistant", "content": content})
 
-    return ai_response
+    return content
