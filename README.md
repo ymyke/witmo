@@ -1,43 +1,12 @@
-- need some completion abstraction or sth?
-- history:
-  - why does history work at all if there's no global var called history?
-  - try w empty history
-  - are images saved and sent again?
-  - should we save timestamps?
-  - are new entries saved? I think not...
-  - is prevented that the entire history gets saved with every new entry?
-  - do we have a clear separator between prompt and history?
-
-
-
 - add the name of the game to the system prompt instead of each new use prompt
-
-- add test mode with pseudocamera?
-- use camera.start, camera.stop, camera.capture as the simplest interface?
-    - do we need the encoding stuff in there?
-    - maybe use a context mgr for the camera?
-
-- make sure the camera app is running!
-- make foto deletion optional
-
-- add spoiler settings / levels
-
-- make sure the image is part of the history
-- how to cope with ever longer history -- with different threads and images?
+- add spoiler settings / levels: initially just as a simple add-on to the system prompt?
 - can we get really useful info?
 - work well w history?
-
 - store prompts somehow?
 - prompt packs per game + a generic pack (or generic packs per genre)?
 - try to get video capture via ps5 app, identify key frames, send to llm and get tipps from that.
 - give the model some sources to check out? (e.g. wikis, guides, etc.) -- in the system prompt?
-
-- "What is the most important, non-trivial hint you can give for this situation?"
-  - both 3o and 4.5 give good results here.
-
 - in general, better use 3o or 4.5?
-
-- add the possibility to add more captures during a chat session?
 
 - remove openapi key from entire history
 
@@ -79,3 +48,5 @@ system prompt:
 # prompt ideas
 
 - what can i safely sell (because there's a lot of it in the world) and what should i definitely keep?
+- "What is the most important, non-trivial hint you can give for this situation?"
+  - both 3o and 4.5 give good results here.
