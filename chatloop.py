@@ -9,7 +9,6 @@ chat_greeting = """\
 ============================================================
 • Ask your follow-up questions.
 • 'q/quit': Back to main loop
-• 'capture': Take a new screenshot
 ------------------------------------------------------------
 """
 
