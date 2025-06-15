@@ -68,7 +68,7 @@ def main(args: argparse.Namespace) -> None:
     print("• Conversation history is maintained for context")
     print("-" * 60)
 
-    global llm_client, client, SYSTEM_PROMPT, history
+    global SYSTEM_PROMPT, history   # TODO
     game_name_safe = args.game_name.replace(" ", "_").lower()
     output_dir = os.path.join("history", game_name_safe)
 
