@@ -69,6 +69,10 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
             print(f"Unknown key. Please select a valid option.")
             continue
 
+        if prompt.strip().lower() in ["exit", "quit", "bye", "q"]:
+            # Just in case the user wanted to quit after pressing enter
+            continue
+
         assert prompt is not None
-        chatloop(image, prompt, session)
+        chatloop(session, prompt, image)
         initial_image = None

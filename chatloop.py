@@ -28,33 +28,43 @@ Response:
 
 
 def chatloop(
-    initial_image: Image | None, initial_prompt: str, session: Session
+    session: Session, initial_prompt: str, initial_image: Image | None
 ) -> None:
-    # TODO Needs to be able to handle initial_image == None
+
     print(chat_greeting)
 
-    print(chat_request_pattern.format(request=initial_prompt))
-    response = generate_completion(
-        initial_prompt,
-        image=initial_image,
-        history=session.history,
-        SYSTEM_PROMPT=session.system_prompt,
-    )
-    print(f"Waiting for a response...")
-    print(chat_response_pattern.format(response=response))
+    image = initial_image
+    user_input = initial_prompt
     while True:
-        user_input = input("\n💬 Your message: ")
-        # TODO what about empty input?
-
-        if user_input.lower() in ["exit", "quit", "bye", "q"]:
-            print("Ending chat session.")
-            break
 
         print(chat_request_pattern.format(request=user_input))
         response = generate_completion(
             user_input,
             history=session.history,
             SYSTEM_PROMPT=session.system_prompt,
+            image=image,
         )
         print(f"Waiting for a response...")
         print(chat_response_pattern.format(response=response))
+
+        image = None  # Clear image so we don't constantly re-send it
+
+        prompt_prompt = "\n💬 Your follow-on request: "
+        while True:
+            user_input = input(prompt_prompt)
+            user_input = user_input.strip()
+
+            if user_input.lower() in ["capture", "cap", "c"]:
+                image = session.camera.capture()
+                image.preview()
+                prompt_prompt = "\n💬 Your request with that new image: "
+                continue  # Also get the prompt for that image
+
+            if not user_input:  # Ensure we don't send empty requests
+                continue
+
+            break
+
+        if user_input.lower() in ["exit", "quit", "bye", "q"]:
+            print("Ending chat session.")
+            break
