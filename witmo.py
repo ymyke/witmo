@@ -27,16 +27,8 @@ def get_ai_completion(question: str, image: Image | None = None) -> str:
     system_message = SYSTEM_PROMPT
     messages = [{"role": "system", "content": system_message}]
 
-    # Add chat history for context:
-    for msg in history.last(10):
-        # For image analysis, allow both string and list content
-        if image:   # TODO does this make sense? should this be done elsewhere?
-            if isinstance(msg.get("content"), (str, list)):
-                messages.append(msg)
-        else:
-            if isinstance(msg.get("content"), str):
-                messages.append(msg)
-
+    messages.extend(history.last(10))
+    
     # Build user message
     if image:
         user_message = {
@@ -79,16 +71,17 @@ Response:
 ============================================================
 """
 
+    print(f"Sent. Waiting for a response...")
     response = get_ai_completion(initial_prompt, initial_image)
     print(answer_pattern.format(response=response))
     while True:
         user_input = input("\n💬 Your message: ")
 
         if user_input.lower() in ["exit", "quit", "bye", "q"]:
-            print("👋 Ending chat session.")
+            print("Ending chat session.")
             break
 
-        print(f"💬 Sending message to AI assistant...")
+        print(f"Sent. Waiting for a response...")
         response = get_ai_completion(user_input)
         print(answer_pattern.format(response=response))
 
