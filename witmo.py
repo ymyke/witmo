@@ -2,18 +2,13 @@ import os
 import argparse
 import sys
 from loguru import logger
-from openai import OpenAI
 from image import Image
 from history import History
-from llm_client import LLMClient
 from argparsing import parse
 from llm import generate_completion
 
 
 # global variables TODO
-client: OpenAI
-llm_client: LLMClient
-chat_context: list = []
 SYSTEM_PROMPT: str
 
 # TODO rename functions?
@@ -39,9 +34,8 @@ Response:
     print(f"Sent. Waiting for a response...")
     response = generate_completion(
         initial_prompt,
-        initial_image,
+        image=initial_image,
         history=history,
-        llm_client=llm_client,
         SYSTEM_PROMPT=SYSTEM_PROMPT,
     )
     print(answer_pattern.format(response=response))
@@ -56,7 +50,6 @@ Response:
         response = generate_completion(
             user_input,
             history=history,
-            llm_client=llm_client,
             SYSTEM_PROMPT=SYSTEM_PROMPT,
         )
         print(answer_pattern.format(response=response))
@@ -89,11 +82,6 @@ def main(args: argparse.Namespace) -> None:
         os.makedirs(output_dir)
         logger.info(f"Created directory: {output_dir}")
 
-    client = OpenAI(api_key="REMOVED_KEY")
-    llm_client = LLMClient(
-        api_key="REMOVED_KEY"
-    )
-    # TODO remove this key
 
     SYSTEM_PROMPT = f"""\
 You are an expert gaming assistant for {args.game_name}. 
