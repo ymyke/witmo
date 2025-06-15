@@ -27,6 +27,9 @@ class History:
                 and (isinstance(msg["content"], str) or isinstance(msg["content"], list))
             ]
             logger.info(f"Loaded existing chat history with {len(self.messages)} messages")
+            skipped_count = len(loaded) - len(self.messages)
+            if skipped_count > 0:
+                logger.warning(f"Skipped {skipped_count} invalid messages in chat history")
         except json.JSONDecodeError:
             logger.warning("Chat history file was corrupted, starting with empty history")
             self.messages = []
