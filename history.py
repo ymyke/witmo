@@ -2,9 +2,10 @@ import os
 import json
 from loguru import logger
 
+
 class History:
-    def __init__(self, file_location:str, file_name:str = "chat_history.json"):
-        self.file_path =  os.path.join(file_location, file_name)
+    def __init__(self, file_location: str, file_name: str = "chat_history.json"):
+        self.file_path = os.path.join(file_location, file_name)
         if not os.path.exists(file_location):
             os.makedirs(file_location)
             logger.info(f"Created directory: {file_location}")
@@ -19,18 +20,27 @@ class History:
             with open(self.file_path, "r", encoding="utf-8") as f:
                 loaded = json.load(f)
             self.messages = [
-                msg for msg in loaded
+                msg
+                for msg in loaded
                 if isinstance(msg, dict)
                 and "role" in msg
                 and "content" in msg
-                and (isinstance(msg["content"], str) or isinstance(msg["content"], list))
+                and (
+                    isinstance(msg["content"], str) or isinstance(msg["content"], list)
+                )
             ]
-            logger.info(f"Loaded existing chat history with {len(self.messages)} messages")
+            logger.info(
+                f"Loaded existing chat history with {len(self.messages)} messages"
+            )
             skipped_count = len(loaded) - len(self.messages)
             if skipped_count > 0:
-                logger.warning(f"Skipped {skipped_count} invalid messages in chat history")
+                logger.warning(
+                    f"Skipped {skipped_count} invalid messages in chat history"
+                )
         except json.JSONDecodeError:
-            logger.warning("Chat history file was corrupted, starting with empty history")
+            logger.warning(
+                "Chat history file was corrupted, starting with empty history"
+            )
             self.messages = []
 
     def save(self):
