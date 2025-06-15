@@ -9,7 +9,6 @@ class History:
             os.makedirs(file_location)
             logger.info(f"Created directory: {file_location}")
         self.messages = []
-        self.load()
 
     def load(self):
         if not os.path.exists(self.file_path):

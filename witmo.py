@@ -55,12 +55,6 @@ Response:
         print(answer_pattern.format(response=response))
 
 
-def save_chat_history():
-    history.save()
-
-
-def load_chat_history():
-    history.load()
 
 
 def main(args: argparse.Namespace) -> None:
@@ -92,6 +86,7 @@ Never just read what you see on the screen, assume that the user can read it the
 """
 
     history = History(output_dir)
+    history.load()
 
     # Camera selection logic:
     if args.test_camera:
@@ -125,7 +120,7 @@ Never just read what you see on the screen, assume that the user can read it the
             image = None
 
     print("\n🔄 Saving chat history...")
-    save_chat_history()
+    history.save()
     print("\n👋 Thanks for using Witmo!")
 
 
