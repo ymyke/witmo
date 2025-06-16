@@ -14,6 +14,11 @@
             "prompt": "Give me the story and lore background I might have missed to understand this situation better. Focus on lore, characters, and events that are relevant to the current context. Only mention things from the game past, nothing from the game future.",
             "summary": "Story background",
             "key": "b"
+        },
+        {
+            "prompt": "Which of these items can I safely sell (e.g., because they are abundant) and which should I definitely keep?",
+            "summary": "Sellable items",
+            "key": "s"
         }
     ]
 }
