@@ -5,6 +5,7 @@ from history import History
 from slugify import slugify
 import system_prompt
 import json
+from spoilers import parse_spoiler_args, generate_spoiler_prompt
 
 
 class Session:
@@ -17,6 +18,7 @@ class Session:
         history,
         camera,
         prompts,
+        spoiler_settings,
     ):
         # TODO simpify this constructor?
         self.game_name = game_name
@@ -26,6 +28,7 @@ class Session:
         self.history = history
         self.camera = camera
         self.prompts = prompts  # dict of prompts for the current game
+        self.spoiler_settings = spoiler_settings
 
     @classmethod
     def from_args(cls, args: argparse.Namespace) -> "Session":
@@ -36,9 +39,16 @@ class Session:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        # System prompt:
-        sysprompt = system_prompt.prompt.format(game_name=args.game_name)
+        # Spoiler settings:
+        spoiler_settings = parse_spoiler_args(args.spoilers)
+        spoiler_prompt = generate_spoiler_prompt(spoiler_settings)
 
+        # System prompt:
+        sysprompt = system_prompt.prompt.format(
+            game_name=args.game_name, spoiler_prompt=spoiler_prompt
+        )
+        logger.debug(f"System prompt:\n{sysprompt}")
+        
         # History:
         history = History(output_dir)
         history.load()
@@ -83,4 +93,5 @@ class Session:
             history,
             camera,
             promptsdir,
+            spoiler_settings,
         )

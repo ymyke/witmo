@@ -4,8 +4,9 @@ import sys
 def parse():
     help_epilog = """\
 example Usage:
-python witmo.py "Baldur's Gate 3"
-python witmo.py "Elden Ring" -d -i myowncapture.jpg
+python witmo.py -g "Baldur's Gate 3"
+python witmo.py -g "Elden Ring" -d -s all=medium story=none
+python witmo.py -g "Elden Ring" -i myowncapture.jpg
 
 prerequisites:
 Connect your Android device via USB with ADB debugging enabled. Have your
@@ -18,7 +19,10 @@ camera app open and top of screen on the device.
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "game_name",
+        "-g",
+        "--game",
+        dest="game_name",
+        required=True,
         help="name of the game being played",
     )
     parser.add_argument(
@@ -58,6 +62,14 @@ camera app open and top of screen on the device.
         default="ERROR",
         choices=["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"],
         help="set loguru log level (default: ERROR)",
+    )
+    parser.add_argument(
+        "-s",
+        "--spoilers",
+        nargs="*",
+        metavar="CATEGORY=LEVEL",
+        default=["all=none"],
+        help="Set spoiler levels per category, e.g. --spoilers all=low story=none (default: all=none)",
     )
 
     if len(sys.argv) == 1:
