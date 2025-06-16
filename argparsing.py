@@ -36,12 +36,20 @@ camera app open and top of screen on the device.
         help="delete the image on the camera device after capturing",
     )
     parser.add_argument(
-        "-t",
+        "-tc",
         "--test-camera",
         dest="test_camera",
         action="store_true",
         default=False,
         help="use test camera",
+    )
+    parser.add_argument(
+        "-nc",
+        "--no-camera",
+        dest="no_camera",
+        action="store_true",
+        default=False,
+        help="run without camera; only use initial image (-i) or text prompts",
     )
     parser.add_argument(
         "-l",
