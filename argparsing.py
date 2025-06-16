@@ -14,7 +14,7 @@ camera app open and top of screen on the device.
 """
     parser = argparse.ArgumentParser(
         prog="witmo.py",
-        description="Witmo — your AI gaming assistant",
+        description="Witmo — g{{ai}}ming coach",
         epilog=help_epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

@@ -7,11 +7,11 @@ from mainloop import mainloop
 
 main_greeting = """\
 ============================================================
-                🎮 WITMO - GAMING ASSISTANT 🎮
+                🎮 WITMO - G{{AI}}MING COACH 🎮
 ============================================================
                       GAME: {game_name}
 ------------------------------------------------------------
-• Capture gameplay, get advice, and chat with your AI assistant
+• Capture gameplay, get advice, and chat with your AI coach
 • Conversation history is maintained for context
 ------------------------------------------------------------
 """
