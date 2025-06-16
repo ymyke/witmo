@@ -8,6 +8,7 @@ chat_greeting = """\
                  💬 STARTING CHAT SESSION 💬
 ============================================================
 • Ask your follow-up questions.
+• 'c/cap/capture': Take a new screenshot
 • 'q/quit': Back to main loop
 ------------------------------------------------------------
 """
