@@ -1,5 +1,8 @@
 # TODO
 
+- switch to coach
+- system prompt: if image, focus only on tv 
+- add game name to system prompt
 - add the name of the game to the system prompt instead of each new use prompt
 - add spoiler settings / levels: initially just as a simple add-on to the system prompt?
 - can we get really useful info?
@@ -8,7 +11,9 @@
 - prompt packs per game + a generic pack (or generic packs per genre)?
 - try to get video capture via ps5 app, identify key frames, send to llm and get tipps from that.
 - give the model some sources to check out? (e.g. wikis, guides, etc.) -- in the system prompt?
-- in general, better use 3o or 4.5?
+- in general, better use o3 or 4.5? Also 4o
+    - support both
+    - have the option to send to both, or to the other one as well
 - add colors to outputs? (e.g., make system messages grey, user input sth, llm output sth etc.)
 - add better support for longer input? e.g., via prompt_toolkit or so?
   - maybe allow user to edit prompt after choosing one and before it gets sent to llm?
@@ -35,13 +40,6 @@ system prompt:
   - make sure to get the latest versions of all sources by reloading them!
   - revise in general to make max effective
 
-## prompt ideas
-
-- what can i safely sell (because there's a lot of it in the world) and what should i definitely keep?
-- "What is the most important, non-trivial hint you can give for this situation?"
-  - both 3o and 4.5 give good results here.
-
-
 -------------------
 
 # Overall application logic
@@ -57,10 +55,9 @@ system prompt:
 - chatloop:
   - send image and prompt to model, display response
   - user can ask follow-up questions
-  - user can capture a new picture (for the same chatloop) [2]
+  - user can capture a new picture (for the same chatloop)
   - user can quit
 
 [1] ask if prompt should be added to a list of pre-configured prompts afterwards?
-[2] not implemented yet
 
 
