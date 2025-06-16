@@ -1,6 +1,7 @@
 from image import Image
 from llm import generate_completion
 from session import Session
+from print_utils import pw
 
 
 chat_greeting = """\
@@ -32,21 +33,21 @@ def chatloop(
     session: Session, initial_prompt: str, initial_image: Image | None
 ) -> None:
 
-    print(chat_greeting)
+    pw(chat_greeting)
 
     image = initial_image
     user_input = initial_prompt
     while True:
 
-        print(chat_request_pattern.format(request=user_input))
+        pw(chat_request_pattern.format(request=user_input))
         response = generate_completion(
             user_input,
             history=session.history,
             SYSTEM_PROMPT=session.system_prompt,
             image=image,
         )
-        print(f"Waiting for a response...")
-        print(chat_response_pattern.format(response=response))
+        pw(f"Waiting for a response...")
+        pw(chat_response_pattern.format(response=response))
 
         image = None  # Clear image so we don't constantly re-send it
 
@@ -67,5 +68,5 @@ def chatloop(
             break
 
         if user_input.lower() in ["exit", "quit", "bye", "q"]:
-            print("Ending chat session.")
+            pw("Ending chat session.")
             break

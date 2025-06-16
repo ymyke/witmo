@@ -2,6 +2,7 @@ from image import Image
 from session import Session
 from readchar import readkey, key
 from chatloop import chatloop
+from print_utils import pw
 
 manual = """\
 Waiting for your command...
@@ -30,7 +31,7 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
         if initial_image:
             k = key.SPACE
         else:
-            print(manual)
+            pw(manual)
             k = readkey()
 
         if k == key.SPACE:
@@ -41,10 +42,10 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
                 image = session.camera.capture()
             image.preview()
 
-            print("\nPick your prompt:")
+            pw("\nPick your prompt:")
             for k, p in session.prompts.items():
-                print(f"'{k}' • {p['summary']} • [{p['prompt'][:60]}...]")
-            print("<enter> • enter your own prompt")
+                pw(f"'{k}' • {p['summary']} • [{p['prompt'][:60]}...]")
+            pw("<enter> • enter your own prompt")
 
             while True:
                 k = readkey()
@@ -53,10 +54,10 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
                     break
                 elif k.lower() in session.prompts:
                     prompt = session.prompts[k]["prompt"]
-                    print(f"\nUsing prompt: {session.prompts[k]['summary']}")
+                    pw(f"\nUsing prompt: {session.prompts[k]['summary']}")
                     break
 
-                print(f"Unknown key. Please select a valid option from the list.")
+                pw(f"Unknown key. Please select a valid option from the list.")
 
         elif k == key.ENTER:
             image = None
@@ -66,7 +67,7 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
             break
 
         else:
-            print(f"Unknown key. Please select a valid option.")
+            pw(f"Unknown key. Please select a valid option.")
             continue
 
         if prompt.strip().lower() in ["exit", "quit", "bye", "q"]:

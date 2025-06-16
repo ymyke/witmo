@@ -4,6 +4,7 @@ from image import Image
 from argparsing import parse
 from session import Session
 from mainloop import mainloop
+from print_utils import pw
 
 main_greeting = """\
 ============================================================
@@ -25,15 +26,15 @@ def start_witmo() -> None:
     session = Session.from_args(args)
     session.history.load()
 
-    print(main_greeting.format(game_name=args.game_name))
+    pw(main_greeting.format(game_name=args.game_name))
 
     with session.camera:
         image = Image(args.initial_image) if args.initial_image else None
         mainloop(session, image)
 
-    print("\n🔄 Saving chat history...")
+    pw("\n🔄 Saving chat history...")
     session.history.save()
-    print("\n👋 Thanks for using Witmo!")
+    pw("\n👋 Thanks for using Witmo!")
 
 
 if __name__ == "__main__":

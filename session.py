@@ -6,6 +6,7 @@ from slugify import slugify
 import system_prompt
 import json
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
+from print_utils import pw
 
 
 class Session:
@@ -82,7 +83,7 @@ class Session:
                 "You can add them to 'prompt_map.json'."
             )
         else:
-            print(f"Loaded {len(promptsdir)} prompts for game '{args.game_name}'.")
+            pw(f"Loaded {len(promptsdir)} prompts for game '{args.game_name}'.")
 
         # Return a new Session instance:
         return cls(
