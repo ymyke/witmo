@@ -19,6 +19,11 @@
             "prompt": "Which of these items can I safely sell (e.g., because they are abundant) and which should I definitely keep?",
             "summary": "Sellable items",
             "key": "s"
+        },
+        {
+            "prompt": "For the current level of my character, is this a good weapon or should I be able to find something much better?",
+            "summary": "Weapon evaluation",
+            "key": "w"
         }
     ]
 }
