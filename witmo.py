@@ -1,5 +1,6 @@
 import sys
 from loguru import logger
+from wakepy import keep
 from image import Image
 from argparsing import parse
 from session import Session
@@ -28,7 +29,7 @@ def start_witmo() -> None:
 
     pw(main_greeting.format(game_name=args.game_name))
 
-    with session.camera:
+    with session.camera, keep.presenting():
         image = Image(args.initial_image) if args.initial_image else None
         mainloop(session, image)
 
