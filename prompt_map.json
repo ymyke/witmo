@@ -24,6 +24,11 @@
             "prompt": "For the current level of my character, is this a good weapon or should I be able to find something much better?",
             "summary": "Weapon evaluation",
             "key": "w"
+        },
+        {
+            "prompt": "What are some really useful things I can craft with the items I have?",
+            "summary": "Crafting ideas",
+            "key": "c"
         }
     ]
 }
