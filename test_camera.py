@@ -2,9 +2,10 @@ import os
 import random
 from image import BasicImage
 from loguru import logger
+from camera_protocol import CameraProtocol
 
 
-class TestCamera:
+class TestCamera(CameraProtocol):
     """A simple test camera that returns a random image from the output_dir on capture."""
 
     def __init__(self, do_delete_remote: bool = False, output_dir="captures"):

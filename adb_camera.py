@@ -17,13 +17,14 @@ import time
 from ppadb.client import Client as AdbClient
 from image import BasicImage
 from loguru import logger
+from camera_protocol import CameraProtocol
 
 
 class CameraError(Exception):
     pass
 
 
-class AdbCamera:
+class AdbCamera(CameraProtocol):
     """A simple class for capturing images via ADB USB connection"""
 
     def __init__(self, do_delete_remote: bool = False, output_dir="captures"):

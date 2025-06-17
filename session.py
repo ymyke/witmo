@@ -8,6 +8,7 @@ import json
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
 from print_utils import pw
 from image import BasicImage, CroppedImage, Image
+from camera_protocol import CameraProtocol
 
 
 class Session:
@@ -18,7 +19,7 @@ class Session:
         output_dir,
         system_prompt,
         history,
-        camera,
+        camera: CameraProtocol,
         prompts,
         spoiler_settings,
         do_crop=False,
@@ -29,7 +30,7 @@ class Session:
         self.output_dir = output_dir
         self.system_prompt = system_prompt
         self.history = history
-        self.camera = camera
+        self.camera: CameraProtocol = camera
         self.prompts = prompts  # dict of prompts for the current game
         self.spoiler_settings = spoiler_settings
         self.do_crop = do_crop
