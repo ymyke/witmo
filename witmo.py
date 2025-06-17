@@ -29,6 +29,7 @@ def start_witmo() -> None:
 
     pw(main_greeting.format(game_name=args.game_name))
 
+    logger.info("Deactivating sleep mode and screen lock until end of session...")
     with session.camera, keep.presenting():
         if args.initial_image:
             image = BasicImage(args.initial_image)
