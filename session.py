@@ -39,7 +39,7 @@ class Session:
 
         # Names and directories:
         game_name_slug = slugify(args.game_name)
-        output_dir = os.path.join("history", game_name_slug)
+        output_dir = os.path.join("history", game_name_slug) # TODO
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
