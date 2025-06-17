@@ -6,25 +6,40 @@ python ./witmo.py -d -s all=high story=none -g "elden ring"
 
 # TODO
 
-- image:
-  - should be imageprotocol?
-  - images should derive from it?
 - remove openapi key from entire history
 - review all the messages/prints
 - clean up all dependencies and produce a nice requirements.txt or poetry file.
 - commands:
-  - ! -- switch voice on/off (maybe also have a cli arg?)
-  - . -- choose model: 3=o3, 4=4o, 5=4.5
-  - <backspace> -- follow up to last prompt/response (instead of chatloop)
-  - <tbd> (,?) -- resend last prompt (e.g., after changing the model)
-- add protocol for camera?
-- have a command that displays the full prompt pack?
-- cli args to:
-  - -so, --spoilers-off: disable all spoiler prompts
-  - -sc "...", --spoilers-custom "...": send the string under "spoiler rules" section
+- add voice
+- have a command that displays the full prompt pack? (e.g. "?")
 - get rid of archive after having voice option
+- save history file more often? -- or turn it into a context mgr as well so it gets saved no matter what.
 
--------------------
+-----------------------------------
+
+# New interaction model
+
+- set up: camera, history, ...
+- mainloop:
+  - show menu
+    - <space> - image flow
+    - <enter> - text flow = which is also follow-up to last prompt/response
+    - "!" - switch voice on/off (maybe also have a cli arg?)
+    - "." - choose model: 3=o3, 4=4o, 5=4.5
+    - <backspace> - resend last prompt (e.g., after changing the model)
+    - <esc> - quit
+  - image flow:
+    - get image via capture (<space>) 
+    - choose a prompt or enter (<enter>) own prompt
+      - (jump here directly initially if image is passed from command line)
+    - send to llm
+    - review response
+  - text flow:
+    - send to llm
+    -  review response
+
+
+-----------------------------------
 
 # Overall application logic
 
