@@ -7,7 +7,7 @@ import system_prompt
 import json
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
 from print_utils import pw
-from camera_protocol import CameraProtocol
+from camera.camera_protocol import CameraProtocol
 
 
 class Session:
@@ -60,16 +60,16 @@ class Session:
         # Camera:
         if args.no_camera:
             logger.info("Running in no-camera mode.")
-            from no_camera import NoCamera
+            from camera.no_camera import NoCamera
 
             camera = NoCamera()
         elif args.test_camera:
             logger.info("Using TestCamera for local testing.")
-            from test_camera import TestCamera
+            from camera.test_camera import TestCamera
 
             camera = TestCamera(args.delete_remote, output_dir)
         else:
-            from adb_camera import AdbCamera
+            from camera.adb_camera import AdbCamera
 
             camera = AdbCamera(args.delete_remote, output_dir)
 

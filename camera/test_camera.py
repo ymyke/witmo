@@ -2,7 +2,7 @@ import os
 import random
 from image import BasicImage
 from loguru import logger
-from camera_protocol import CameraProtocol
+from .camera_protocol import CameraProtocol
 
 
 class TestCamera(CameraProtocol):

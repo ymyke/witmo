@@ -17,7 +17,7 @@ import time
 from ppadb.client import Client as AdbClient
 from image import BasicImage
 from loguru import logger
-from camera_protocol import CameraProtocol
+from .camera_protocol import CameraProtocol
 
 
 class CameraError(Exception):

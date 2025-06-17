@@ -1,4 +1,4 @@
-from camera_protocol import CameraProtocol
+from .camera_protocol import CameraProtocol
 
 class NoCamera(CameraProtocol):
     """A dummy camera class that does nothing."""
