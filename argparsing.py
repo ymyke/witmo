@@ -4,17 +4,24 @@ import sys
 def parse():
     help_epilog = """\
 example usage:
-python witmo.py -g "Baldur's Gate 3"
-python witmo.py -g "Elden Ring" -d -s all=high story=none
-python witmo.py -g "Elden Ring" -i myowncapture.jpg
+  python witmo.py -g "Baldur's Gate 3"
+  python witmo.py -g "Elden Ring" -d -s all=high story=none
+  python witmo.py -g "Elden Ring" -i myowncapture.jpg
+
+spoiler control:
+  Use --spoilers to set what the llm should reveal. Format: CATEGORY=LEVEL.
+  Categories: items, locations, enemies, bosses, story, lore, mechanics.
+  Levels: none (no spoilers), low, medium, high.
+  Example: --spoilers all=medium story=none lore=high mechanics=high
+  'all' sets all categories; individual categories override.
 
 prerequisites:
-Connect your Android device via USB with ADB debugging enabled. Have your
-camera app open and top of screen on the device.
+  Connect your Android device via USB with ADB debugging enabled. Have your
+  camera app open and top of screen on the device.
 """
     parser = argparse.ArgumentParser(
         prog="witmo.py",
-        description="Witmo — g{{ai}}ming coach",
+        description="Witmo — g{ai}ming coach",
         epilog=help_epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
