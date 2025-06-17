@@ -1,6 +1,6 @@
 import os
 import random
-from image import Image
+from image import BasicImage
 from loguru import logger
 
 
@@ -12,7 +12,7 @@ class TestCamera:
         if not os.path.exists(self.output_dir):
             raise ValueError(f"Output directory does not exist: {self.output_dir}")
 
-    def capture(self) -> Image:
+    def capture(self) -> BasicImage:
         images = [
             f
             for f in os.listdir(self.output_dir)
@@ -24,7 +24,7 @@ class TestCamera:
             raise RuntimeError(f"No images found in {self.output_dir}")
         chosen = random.choice(images)
         logger.info(f"Selected test image: {chosen}")
-        return Image(os.path.join(self.output_dir, chosen))
+        return BasicImage(os.path.join(self.output_dir, chosen))
 
     def __enter__(self):
         return self

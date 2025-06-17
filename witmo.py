@@ -1,11 +1,11 @@
 import sys
 from loguru import logger
 from wakepy import keep
-from image import Image
 from argparsing import parse
 from session import Session
 from mainloop import mainloop
 from print_utils import pw
+from image import BasicImage, CroppedImage
 
 main_greeting = """\
 ============================================================
@@ -30,7 +30,12 @@ def start_witmo() -> None:
     pw(main_greeting.format(game_name=args.game_name))
 
     with session.camera, keep.presenting():
-        image = Image(args.initial_image) if args.initial_image else None
+        if args.initial_image:
+            image = BasicImage(args.initial_image)
+            if session.do_crop:
+                image = CroppedImage(image)
+        else:
+            image = None
         mainloop(session, image)
 
     pw("\n🔄 Saving chat history...")

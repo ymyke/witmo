@@ -1,4 +1,4 @@
-from image import Image
+from image import CroppedImage, Image
 from session import Session
 from readchar import readkey, key
 from chatloop import chatloop
@@ -40,6 +40,8 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
                 image = initial_image
             else:
                 image = session.camera.capture()
+                if session.do_crop:
+                    image = CroppedImage(image)
             image.preview()
 
             pw("\nPick your prompt:")

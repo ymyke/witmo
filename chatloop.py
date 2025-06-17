@@ -1,4 +1,4 @@
-from image import Image
+from image import CroppedImage, Image
 from llm import generate_completion
 from session import Session
 from print_utils import pw
@@ -58,6 +58,8 @@ def chatloop(
 
             if user_input.lower() in ["capture", "cap", "c"]:
                 image = session.camera.capture()
+                if session.do_crop:
+                    image = CroppedImage(image)
                 image.preview()
                 prompt_prompt = "\n💬 Your request with that new image: "
                 continue  # Also get the prompt for that image

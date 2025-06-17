@@ -5,7 +5,7 @@ def parse():
     help_epilog = """\
 example usage:
   python witmo.py -g "Baldur's Gate 3"
-  python witmo.py -g "Elden Ring" -d -s all=high story=none
+  python witmo.py -g "Elden Ring" -c -d -s all=high story=none
   python witmo.py -g "Elden Ring" -i myowncapture.jpg
 
 spoiler control:
@@ -48,7 +48,15 @@ prerequisites:
         nargs="*",
         metavar="CATEGORY=LEVEL",
         default=["all=none"],
-        help="Set spoiler levels per category, e.g. --spoilers all=low story=none (default: all=none)",
+        help="set spoiler levels per category, e.g. --spoilers all=low story=none (default: all=none)",
+    )
+    parser.add_argument(
+        "-c",
+        "--crop",
+        dest="crop",
+        action="store_true",
+        default=False,
+        help="crop images to detected TV/screen before sending to LLM",
     )
 
     # Dev/debugging options:

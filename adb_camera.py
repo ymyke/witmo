@@ -15,7 +15,7 @@ To set up adb:
 import os
 import time
 from ppadb.client import Client as AdbClient
-from image import Image
+from image import BasicImage
 from loguru import logger
 
 
@@ -126,8 +126,8 @@ class AdbCamera:
                 "Camera app is not running. Please open the camera app on your device."
             )
 
-    def capture(self) -> Image:
-        """Capture an image using the device's camera and return an Image object."""
+    def capture(self) -> BasicImage:
+        """Capture an image using the device's camera and return a BasicImage object."""
         logger.info("📸 Taking photo...")
 
         self.assert_running()
@@ -150,7 +150,7 @@ class AdbCamera:
 
         logger.info(f"Found recent image at {latest_image}")
         logger.info(f"Transferring image to local machine...")
-        local_image = Image.create_with_timestamp(self.output_dir)
+        local_image = BasicImage.create_with_timestamp(self.output_dir)
         self.device.pull(latest_image, local_image.path)
 
         if self.do_delete_remote:

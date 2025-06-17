@@ -7,6 +7,7 @@ import system_prompt
 import json
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
 from print_utils import pw
+from image import BasicImage, CroppedImage, Image
 
 
 class Session:
@@ -20,6 +21,7 @@ class Session:
         camera,
         prompts,
         spoiler_settings,
+        do_crop=False,
     ):
         # TODO simpify this constructor?
         self.game_name = game_name
@@ -30,6 +32,7 @@ class Session:
         self.camera = camera
         self.prompts = prompts  # dict of prompts for the current game
         self.spoiler_settings = spoiler_settings
+        self.do_crop = do_crop
 
     @classmethod
     def from_args(cls, args: argparse.Namespace) -> "Session":
@@ -49,7 +52,7 @@ class Session:
             game_name=args.game_name, spoiler_prompt=spoiler_prompt
         )
         logger.debug(f"System prompt:\n{sysprompt}")
-        
+
         # History:
         history = History(output_dir)
         history.load()
@@ -85,6 +88,9 @@ class Session:
         else:
             pw(f"Loaded {len(promptsdir)} prompts for game '{args.game_name}'.")
 
+        # Whether to crop the images:
+        do_crop = getattr(args, "crop", False)
+
         # Return a new Session instance:
         return cls(
             args.game_name,
@@ -95,4 +101,5 @@ class Session:
             camera,
             promptsdir,
             spoiler_settings,
+            do_crop=do_crop,
         )
