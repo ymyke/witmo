@@ -123,7 +123,7 @@ class CroppedImage:
         logger.debug("No TV found, using full image.")
         return (0, 0, w, h)
 
-    def preview(self, seconds=50, preview_width=400):
+    def preview(self, seconds=5, preview_width=400):
         preview_image_array(self._cropped_array, seconds=seconds, preview_width=preview_width, window_name="Witmo Cropped Capture")
 
     def to_base64(self) -> str:
