@@ -1,8 +1,8 @@
 import os
 from loguru import logger
-from history import History
 from image import Image
 from openai import OpenAI
+from .history import History
 
 # Set up OpenAI client:
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")

@@ -1,9 +1,9 @@
 from image import CroppedImage, BasicImage, Image
-from llm import generate_completion
 from session import Session
 from readchar import readkey, key
 from print_utils import pw
-from llm_models import llm_model_manager
+from llm.completion import generate_completion
+from llm.models import model_manager
 
 menu = """\
 
@@ -49,16 +49,16 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = key.SPACE
         else:
             pw(menu)
-            pw(f"[LLM: {llm_model_manager.current_model.shortname}]")
+            pw(f"[LLM: {model_manager.current_model.shortname}]")
             k = readkey()
 
         if k == ".":
             while True:
-                pw(llm_model_manager.as_menu())
+                pw(model_manager.as_menu())
                 llmkey = readkey()
-                if llm_model_manager.has_key(llmkey):
-                    llm_model_manager.set_current_model_by_key(llmkey)
-                    pw(f"LLM set to: {llm_model_manager.current_model.name}")
+                if model_manager.has_key(llmkey):
+                    model_manager.set_current_model_by_key(llmkey)
+                    pw(f"LLM set to: {model_manager.current_model.name}")
                     break
                 elif llmkey == key.ESC:
                     break
@@ -112,7 +112,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             history=session.history,
             SYSTEM_PROMPT=session.system_prompt,
             image=image,
-            model=llm_model_manager.current_model.api_name,
+            model=model_manager.current_model.api_name,
         )
         pw(f"Waiting for a response...")
         pw(chat_response_pattern.format(response=response))

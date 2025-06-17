@@ -1,10 +1,10 @@
 import os
 import argparse
-from loguru import logger
-from history import History
-from slugify import slugify
-import system_prompt
 import json
+from loguru import logger
+from slugify import slugify
+from llm import system_prompt
+from llm.history import History
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
 from print_utils import pw
 from camera.camera_protocol import CameraProtocol
