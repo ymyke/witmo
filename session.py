@@ -7,7 +7,6 @@ import system_prompt
 import json
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
 from print_utils import pw
-from image import BasicImage, CroppedImage, Image
 from camera_protocol import CameraProtocol
 
 
