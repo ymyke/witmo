@@ -66,7 +66,7 @@ class Image(Protocol):
         ...
 
 
-class BasicImage:
+class BasicImage(Image):
     """Value object representing a captured image file."""
 
     def __init__(self, path: str):
@@ -92,7 +92,7 @@ class BasicImage:
         return cls(filename)
 
 
-class CroppedImage:
+class CroppedImage(Image):
     """Represents a cropped version of a BasicImage, held in memory. Initiator will crop
     to tv /screen region automatically.
     """ 
