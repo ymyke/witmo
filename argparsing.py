@@ -3,9 +3,9 @@ import sys
 
 def parse():
     help_epilog = """\
-example Usage:
+example usage:
 python witmo.py -g "Baldur's Gate 3"
-python witmo.py -g "Elden Ring" -d -s all=medium story=none
+python witmo.py -g "Elden Ring" -d -s all=high story=none
 python witmo.py -g "Elden Ring" -i myowncapture.jpg
 
 prerequisites:
@@ -18,18 +18,14 @@ camera app open and top of screen on the device.
         epilog=help_epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+
+    # Regular options:
     parser.add_argument(
         "-g",
         "--game",
         dest="game_name",
         required=True,
         help="name of the game being played",
-    )
-    parser.add_argument(
-        "-i",
-        "--initial-image",
-        dest="initial_image",
-        help="path to an initial image to analyze instead of capturing one",
     )
     parser.add_argument(
         "-d",
@@ -40,14 +36,31 @@ camera app open and top of screen on the device.
         help="delete the image on the camera device after capturing",
     )
     parser.add_argument(
+        "-s",
+        "--spoilers",
+        nargs="*",
+        metavar="CATEGORY=LEVEL",
+        default=["all=none"],
+        help="Set spoiler levels per category, e.g. --spoilers all=low story=none (default: all=none)",
+    )
+
+    # Dev/debugging options:
+    debug_group = parser.add_argument_group('dev/debugging options')
+    debug_group.add_argument(
+        "-i",
+        "--initial-image",
+        dest="initial_image",
+        help="path to an initial image to analyze instead of capturing one",
+    )
+    debug_group.add_argument(
         "-tc",
         "--test-camera",
         dest="test_camera",
         action="store_true",
         default=False,
-        help="use test camera",
+        help="use test camera; picks a random image from the history directory",
     )
-    parser.add_argument(
+    debug_group.add_argument(
         "-nc",
         "--no-camera",
         dest="no_camera",
@@ -55,21 +68,13 @@ camera app open and top of screen on the device.
         default=False,
         help="run without camera; only use initial image (-i) or text prompts",
     )
-    parser.add_argument(
+    debug_group.add_argument(
         "-l",
         "--log-level",
         dest="log_level",
         default="ERROR",
         choices=["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"],
         help="set loguru log level (default: ERROR)",
-    )
-    parser.add_argument(
-        "-s",
-        "--spoilers",
-        nargs="*",
-        metavar="CATEGORY=LEVEL",
-        default=["all=none"],
-        help="Set spoiler levels per category, e.g. --spoilers all=low story=none (default: all=none)",
     )
 
     if len(sys.argv) == 1:
