@@ -58,8 +58,11 @@ def generate_completion(
         logger.error("Received empty response from LLM.")
         content = "<<no response>>"
 
-    if history:
+    if history is not None:
+        logger.debug(f"Adding interaction to history")
         history.append(user_message)
         history.append({"role": "assistant", "content": content})
+    else:
+        logger.debug("No history provided, skipping history update.")
 
     return content
