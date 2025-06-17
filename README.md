@@ -24,9 +24,10 @@ python ./witmo.py -d -s all=high story=none -g "elden ring"
   - show menu
     - <space> - image flow
     - <enter> - text flow = which is also follow-up to last prompt/response
-    - "!" - switch voice on/off (maybe also have a cli arg?)
-    - "." - choose model: 3=o3, 4=4o, 5=4.5
-    - <backspace> - resend last prompt (e.g., after changing the model)
+    - "^" - pick another prompt from the preconfigured list TODO
+    - "!" - switch voice on/off (maybe also have a cli arg?) TODO
+    - "." - choose model: 3=o3, 4=4o, 5=4.5 TODO
+    - <backspace> - resend last prompt (e.g., after changing the model) TODO
     - <esc> - quit
   - image flow:
     - get image via capture (<space>) 
@@ -36,7 +37,7 @@ python ./witmo.py -d -s all=high story=none -g "elden ring"
     - review response
   - text flow:
     - send to llm
-    -  review response
+    - review response
 
 
 -----------------------------------
