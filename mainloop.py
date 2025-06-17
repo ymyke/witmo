@@ -3,11 +3,14 @@ from llm import generate_completion
 from session import Session
 from readchar import readkey, key
 from print_utils import pw
+from llm_models import llm_model_manager
 
 menu = """\
+
 Waiting for your command...
 <space>  • capture a new image
 <enter>  • enter prompt
+'.'      • select LLM model
 <escape> • quit
 """
 
@@ -29,7 +32,7 @@ Response:
 def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
     """Main interactive loop for the application.
 
-    Behavior: 
+    Behavior:
     - If initial_image is provided, the loop will immediately use it as the image for
       the first prompt selection, skipping the manual and image capture step.
     - Otherwise, the user is prompted to capture a new image, start a chat without an
@@ -39,7 +42,6 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
     """
 
     while True:
-
         prompt = None
         image: Image | None = None
         if initial_image:
@@ -47,10 +49,24 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = key.SPACE
         else:
             pw(menu)
+            pw(f"[LLM: {llm_model_manager.current_model.shortname}]")
             k = readkey()
 
-        if k == key.SPACE:
+        if k == ".":
+            while True:
+                pw(llm_model_manager.as_menu())
+                llmkey = readkey()
+                if llm_model_manager.has_key(llmkey):
+                    llm_model_manager.set_current_model_by_key(llmkey)
+                    pw(f"LLM set to: {llm_model_manager.current_model.name}")
+                    break
+                elif llmkey == key.ESC:
+                    break
+                else:
+                    pw("Unknown key. Please select 3, 4, 5, or <escape>.")
+            continue
 
+        if k == key.SPACE:
             if not image:
                 image = session.camera.capture()
             if session.do_crop:
@@ -58,12 +74,12 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             image.preview()
 
             pw("\nPick your prompt:")
-            for k, p in session.prompts.items():
+            for k, p in session.prompts.items():  # TODO use different k
                 pw(f"'{k}' • {p['summary']} • [{p['prompt'][:60]}...]")
             pw("<enter> • enter your own prompt")
 
             while True:
-                k = readkey()
+                k = readkey()  # TODO use different k
                 if k == key.ENTER:
                     prompt = input("\nEnter your prompt: ")
                     break
@@ -96,8 +112,8 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             history=session.history,
             SYSTEM_PROMPT=session.system_prompt,
             image=image,
+            model=llm_model_manager.current_model.api_name,
         )
         pw(f"Waiting for a response...")
         pw(chat_response_pattern.format(response=response))
-        
         image = None
