@@ -1,18 +1,32 @@
-from image import CroppedImage, Image
+from image import CroppedImage, BasicImage, Image
+from llm import generate_completion
 from session import Session
 from readchar import readkey, key
-from chatloop import chatloop
 from print_utils import pw
 
-manual = """\
+menu = """\
 Waiting for your command...
 <space>  • capture a new image
-<enter>  • start chat w/o image
+<enter>  • enter prompt
 <escape> • quit
 """
 
+chat_request_pattern = """\
+Request:
+------------------------------------------------------------
+{request}
+------------------------------------------------------------
+"""
 
-def mainloop(session: Session, initial_image: Image | None = None) -> None:
+chat_response_pattern = """\
+Response:
+============================================================
+{response}
+============================================================
+"""
+
+
+def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
     """Main interactive loop for the application.
 
     Behavior: 
@@ -26,22 +40,21 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
 
     while True:
 
-        image = None
         prompt = None
+        image: Image | None = None
         if initial_image:
+            image = initial_image
             k = key.SPACE
         else:
-            pw(manual)
+            pw(menu)
             k = readkey()
 
         if k == key.SPACE:
 
-            if initial_image:
-                image = initial_image
-            else:
+            if not image:
                 image = session.camera.capture()
-                if session.do_crop:
-                    image = CroppedImage(image)
+            if session.do_crop:
+                image = CroppedImage(image)
             image.preview()
 
             pw("\nPick your prompt:")
@@ -62,7 +75,7 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
                 pw(f"Unknown key. Please select a valid option from the list.")
 
         elif k == key.ENTER:
-            image = None
+            assert image is None
             prompt = input("\nEnter your prompt: ")
 
         elif k == key.ESC:
@@ -77,5 +90,14 @@ def mainloop(session: Session, initial_image: Image | None = None) -> None:
             continue
 
         assert prompt is not None
-        chatloop(session, prompt, image)
-        initial_image = None
+        pw(chat_request_pattern.format(request=prompt))
+        response = generate_completion(
+            prompt,
+            history=session.history,
+            SYSTEM_PROMPT=session.system_prompt,
+            image=image,
+        )
+        pw(f"Waiting for a response...")
+        pw(chat_response_pattern.format(response=response))
+        
+        image = None

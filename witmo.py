@@ -31,12 +31,7 @@ def start_witmo() -> None:
 
     logger.info("Deactivating sleep mode and screen lock until end of session...")
     with session.camera, keep.presenting():
-        if args.initial_image:
-            image = BasicImage(args.initial_image)
-            if session.do_crop:
-                image = CroppedImage(image)
-        else:
-            image = None
+        image = BasicImage(args.initial_image) if args.initial_image else None
         mainloop(session, image)
 
     pw("\n🔄 Saving chat history...")
