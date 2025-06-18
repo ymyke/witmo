@@ -1,15 +1,8 @@
 import os
 from loguru import logger
 from image import Image
-from openai import OpenAI
 from .history import History
-
-# Set up OpenAI client:
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY environment variable not set.")
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
-
+from .openai_client import openai_client
 
 def generate_completion(
     question: str,

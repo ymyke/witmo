@@ -4,6 +4,7 @@ from readchar import readkey, key
 from print_utils import pw
 from llm.completion import generate_completion
 from llm.models import model_manager
+from llm.voice_output import speak_text
 
 menu = """\
 
@@ -11,6 +12,7 @@ Waiting for your command...
 <space>  • capture a new image
 <enter>  • enter prompt
 '.'      • select LLM model
+'!'      • toggle voice output
 <escape> • quit
 """
 
@@ -41,6 +43,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
       rest of the session.
     """
 
+    voice_output_enabled = False
     while True:
         prompt = None
         image: Image | None = None
@@ -49,7 +52,8 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = key.SPACE
         else:
             pw(menu)
-            pw(f"[LLM: {model_manager.current_model.shortname}]")
+            voice_state = "ON" if voice_output_enabled else "OFF"
+            pw(f"[Voice: {voice_state}, LLM: {model_manager.current_model.shortname}]")
             k = readkey()
 
         if k == ".":
@@ -64,6 +68,11 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
                     break
                 else:
                     pw("Unknown key. Please select 3, 4, 5, or <escape>.")
+            continue
+
+        elif k == "!":
+            voice_output_enabled = not voice_output_enabled
+            pw(f"Voice output is now {'ON' if voice_output_enabled else 'OFF'}.")
             continue
 
         if k == key.SPACE:
@@ -116,4 +125,6 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
         )
         pw(f"Waiting for a response...")
         pw(chat_response_pattern.format(response=response))
+        if voice_output_enabled:
+            speak_text(response)
         image = None
