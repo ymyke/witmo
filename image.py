@@ -15,7 +15,6 @@ import numpy as np
 import base64
 import threading
 import cv2
-from ultralytics import YOLO
 
 # FIXME The way BasicImage and CroppedImage is architected is a bit of a mess?
 
@@ -95,8 +94,8 @@ class BasicImage(Image):
 class CroppedImage(Image):
     """Represents a cropped version of a BasicImage, held in memory. Initiator will crop
     to tv /screen region automatically.
-    """ 
-    _yolo_model = YOLO("yolov8n.pt")
+    """
+    _yolo_model = None  # Lazy-load YOLO model
     _tv_class_id = 62  # COCO class ID for 'tvmonitor'
 
     def __init__(self, source_image: BasicImage):
@@ -111,7 +110,14 @@ class CroppedImage(Image):
         detected TV, or full image if not found.
         """
         logger.debug("Finding screen...")
-        results = self._yolo_model(img, verbose=False)
+
+        if CroppedImage._yolo_model is None:    # Lazy-load YOLO and model
+            from ultralytics import YOLO
+
+            logger.debug("Loading YOLOv8 model for the first time...")
+            CroppedImage._yolo_model = YOLO("yolov8n.pt")
+
+        results = CroppedImage._yolo_model(img, verbose=False)
         for r in results:
             for b in r.boxes:
                 if int(b.cls[0]) == self._tv_class_id:
