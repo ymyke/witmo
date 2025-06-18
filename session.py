@@ -37,27 +37,34 @@ class Session:
     @classmethod
     def from_args(cls, args: argparse.Namespace) -> "Session":
 
+        logger.debug("Creating a new session from command line arguments...")
+
         # Names and directories:
+        logger.debug("Setting up game name and output directory...")
         game_name_slug = slugify(args.game_name)
         output_dir = os.path.join("history", game_name_slug) # TODO
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
         # Spoiler settings:
+        logger.debug("Parsing spoiler settings...")
         spoiler_settings = parse_spoiler_args(args.spoilers)
         spoiler_prompt = generate_spoiler_prompt(spoiler_settings)
 
         # System prompt:
+        logger.debug("Generating system prompt...")
         sysprompt = system_prompt.prompt.format(
             game_name=args.game_name, spoiler_prompt=spoiler_prompt
         )
         logger.debug(f"System prompt:\n{sysprompt}")
 
         # History:
+        logger.debug("Loading chat history...")
         history = History(output_dir)
         history.load()
 
         # Camera:
+        logger.debug("Initializing camera...")
         if args.no_camera:
             logger.info("Running in no-camera mode.")
             from camera.no_camera import NoCamera
@@ -74,6 +81,7 @@ class Session:
             camera = AdbCamera(args.delete_remote, output_dir)
 
         # Prompts:
+        logger.debug("Loading prompts...")
         with open("prompt_map.json", "r", encoding="utf-8") as f:
             promptmap = json.load(f)
         promptlist = promptmap.get(game_name_slug, [])
