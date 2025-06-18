@@ -5,7 +5,6 @@ from loguru import logger
 import tempfile
 import threading
 from print_utils import pw
-from .openai_client import openai_client
 
 
 def speak_text(text: str, voice: str = "alloy") -> None:
@@ -32,6 +31,8 @@ def speak_text(text: str, voice: str = "alloy") -> None:
     if not "pygame" in sys.modules:
         os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
         import pygame
+    if "openai_client" not in sys.modules:
+        from .openai_client import openai_client
 
     pw("Generating and playing voice output in the background...")
     if not pygame.mixer.get_init():

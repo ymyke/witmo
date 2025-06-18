@@ -1,7 +1,8 @@
+import sys
 from loguru import logger
 from image import Image
 from .history import History
-from .openai_client import openai_client
+
 
 def generate_completion(
     question: str,
@@ -41,6 +42,8 @@ def generate_completion(
     messages.append(user_message)
 
     # Call OpenAI model:
+    if "openai_client" not in sys.modules:
+        from .openai_client import openai_client
     response = openai_client.chat.completions.create(
         model=model,
         messages=messages,  # type: ignore
