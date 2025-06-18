@@ -20,11 +20,13 @@ main_greeting = """\
 
 
 def start_witmo() -> None:
+    logger.debug("Starting Witmo...")
     args = parse()
     logger.remove()
     logger.add(sys.stderr, level=args.log_level)
 
     session = Session.from_args(args)
+    logger.debug("Loading history...")
     session.history.load()
 
     pw(main_greeting.format(game_name=args.game_name))
