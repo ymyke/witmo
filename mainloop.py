@@ -2,7 +2,6 @@ from image import CroppedImage, BasicImage, Image
 from session import Session
 from readchar import readkey, key
 from llm.completion import generate_completion
-from llm.models import model_manager
 from llm.voice_output import speak_text
 from tui.print_wrapped import pw
 from tui.select_prompt import pick_prompt
@@ -45,7 +44,6 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
       rest of the session.
     """
 
-    voice_output_enabled = False
     while True:
 
         # Setup, show menu, handle special case where initial_image is provided:
@@ -56,17 +54,21 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = key.SPACE
         else:
             pw(menu)
-            voice_state = "ON" if voice_output_enabled else "OFF"
-            pw(f"[Voice: {voice_state}, LLM: {model_manager.current_model.shortname}]")
+            voice_state = "ON" if session.voice_output_enabled else "OFF"
+            pw(
+                f"[Voice: {voice_state}, LLM: {session.model_manager.current_model.shortname}]"
+            )
             k = readkey()
 
         # Handle the different keys:
         if k == ".":
-            select_llm()
+            select_llm(session)
             continue
         elif k == "!":
-            voice_output_enabled = not voice_output_enabled
-            pw(f"Voice output is now {'ON' if voice_output_enabled else 'OFF'}.")
+            session.voice_output_enabled = not session.voice_output_enabled
+            pw(
+                f"Voice output is now {'ON' if session.voice_output_enabled else 'OFF'}."
+            )
             continue
         if k == key.SPACE:
             if not image:
@@ -95,12 +97,12 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
         response = generate_completion(
             prompt,
             history=session.history,
-            SYSTEM_PROMPT=session.system_prompt,
+            system_prompt=session.system_prompt,
             image=image,
-            model=model_manager.current_model.api_name,
+            model=session.model_manager.current_model.api_name,
         )
         pw(f"Waiting for a response...")
         pw(chat_response_pattern.format(response=response))
-        if voice_output_enabled:
+        if session.voice_output_enabled:
             speak_text(response)
         image = None

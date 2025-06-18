@@ -1,15 +1,15 @@
 from readchar import readkey, key
 from tui.print_wrapped import pw
-from llm.models import model_manager
+from session import Session
 
 
-def select_llm() -> None:
+def select_llm(session: Session) -> None:
     while True:
-        pw(model_manager.as_menu())  # TODO
+        pw(session.model_manager.as_menu())  # TODO
         k = readkey()
-        if model_manager.has_key(k):
-            model_manager.set_current_model_by_key(k)
-            pw(f"LLM set to: {model_manager.current_model.name}")
+        if session.model_manager.has_key(k):
+            session.model_manager.set_current_model_by_key(k)
+            pw(f"LLM set to: {session.model_manager.current_model.name}")
             break
         elif k == key.ESC:
             break

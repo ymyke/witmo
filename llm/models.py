@@ -17,7 +17,7 @@ class ModelManager:
                 shortname="4.5", name="OpenAI 4.5", api_name="gpt-4.5-preview"
             ),
         }
-        self._current_key = "3"
+        self._current_key = self._models.keys().__iter__().__next__()
 
     @property
     def current_model(self) -> Model:
@@ -41,5 +41,3 @@ class ModelManager:
         return menu
 
 
-# Singleton instance:
-model_manager = ModelManager()

@@ -5,63 +5,55 @@ from loguru import logger
 from slugify import slugify
 from llm import system_prompt
 from llm.history import History
+from llm.models import ModelManager
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
 from tui.print_wrapped import pw
 from camera.camera_protocol import CameraProtocol
 
 
 class Session:
-    def __init__(
-        self,
-        game_name,
-        game_name_slug,
-        output_dir,
-        system_prompt,
-        history,
-        camera: CameraProtocol,
-        prompts,
-        spoiler_settings,
-        do_crop=False,
-    ):
-        # TODO simpify this constructor?
-        self.game_name = game_name
-        self.game_name_slug = game_name_slug
-        self.output_dir = output_dir
-        self.system_prompt = system_prompt
-        self.history = history
-        self.camera: CameraProtocol = camera
-        self.prompts = prompts  # dict of prompts for the current game
-        self.spoiler_settings = spoiler_settings
-        self.do_crop = do_crop
+    game_name: str
+    game_name_slug: str
+    history_location: str
+    output_dir: str
+    spoiler_prompt: str
+    system_prompt: str
+    history: History
+    camera: CameraProtocol
+    prompts: dict[str, dict]
+    do_crop: bool
+    voice_output_enabled: bool
+    model_manager: ModelManager
 
     @classmethod
     def from_args(cls, args: argparse.Namespace) -> "Session":
+        obj = cls()
 
         logger.debug("Creating a new session from command line arguments...")
 
         # Names and directories:
         logger.debug("Setting up game name and output directory...")
-        game_name_slug = slugify(args.game_name)
-        output_dir = os.path.join("history", game_name_slug) # TODO
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        obj.history_location = "history"
+        obj.game_name = args.game_name.strip()
+        obj.game_name_slug = slugify(args.game_name)
+        obj.output_dir = os.path.join(obj.history_location, obj.game_name_slug)
+        if not os.path.exists(obj.output_dir):
+            os.makedirs(obj.output_dir)
 
         # Spoiler settings:
         logger.debug("Parsing spoiler settings...")
-        spoiler_settings = parse_spoiler_args(args.spoilers)
-        spoiler_prompt = generate_spoiler_prompt(spoiler_settings)
+        obj.spoiler_prompt = generate_spoiler_prompt(parse_spoiler_args(args.spoilers))
 
         # System prompt:
         logger.debug("Generating system prompt...")
-        sysprompt = system_prompt.prompt.format(
-            game_name=args.game_name, spoiler_prompt=spoiler_prompt
+        obj.system_prompt = system_prompt.prompt.format(
+            game_name=args.game_name, spoiler_prompt=obj.spoiler_prompt
         )
-        logger.debug(f"System prompt:\n{sysprompt}")
+        logger.debug(f"System prompt:\n{obj.system_prompt}")
 
         # History:
         logger.debug("Loading chat history...")
-        history = History(output_dir)
-        history.load()
+        obj.history = History(obj.output_dir)
 
         # Camera:
         logger.debug("Initializing camera...")
@@ -69,45 +61,42 @@ class Session:
             logger.info("Running in no-camera mode.")
             from camera.no_camera import NoCamera
 
-            camera = NoCamera()
+            obj.camera = NoCamera()
         elif args.test_camera:
             logger.info("Using TestCamera for local testing.")
             from camera.test_camera import TestCamera
 
-            camera = TestCamera(args.delete_remote, output_dir)
+            obj.camera = TestCamera(args.delete_remote, obj.output_dir)
         else:
             from camera.adb_camera import AdbCamera
 
-            camera = AdbCamera(args.delete_remote, output_dir)
+            obj.camera = AdbCamera(args.delete_remote, obj.output_dir)
 
         # Prompts:
         logger.debug("Loading prompts...")
         with open("prompt_map.json", "r", encoding="utf-8") as f:
             promptmap = json.load(f)
-        promptlist = promptmap.get(game_name_slug, [])
-        promptsdir = {
+        promptlist = promptmap.get(obj.game_name_slug, [])
+        obj.prompts = {
             item["key"]: item for item in sorted(promptlist, key=lambda x: x["key"])
         }
-        if not promptsdir:
+        if not obj.prompts:
             logger.warning(
                 f"No prompts found for game '{args.game_name}'. "
                 "You can add them to 'prompt_map.json'."
             )
         else:
-            pw(f"Loaded {len(promptsdir)} prompts for game '{args.game_name}'.")
+            pw(f"Loaded {len(obj.prompts)} prompts for game '{args.game_name}'.")
 
         # Whether to crop the images:
-        do_crop = getattr(args, "crop", False)
+        obj.do_crop = getattr(args, "crop", False)
 
-        # Return a new Session instance:
-        return cls(
-            args.game_name,
-            game_name_slug,
-            output_dir,
-            sysprompt,
-            history,
-            camera,
-            promptsdir,
-            spoiler_settings,
-            do_crop=do_crop,
-        )
+        # Whether voice output is enabled:
+        obj.voice_output_enabled = False
+
+        # Set up model manager:
+        logger.debug("Setting up model manager...")
+        obj.model_manager = ModelManager()
+        obj.model_manager.set_current_model_by_key("3")
+
+        return obj

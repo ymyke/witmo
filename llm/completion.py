@@ -9,8 +9,8 @@ def generate_completion(
     *,
     image: Image | None = None,
     history: History | None = None,
-    SYSTEM_PROMPT,
     model: str = "o3",
+    system_prompt: str | None = None,
 ) -> str:
     """
     Handles message marshalling for both text and image+text completions, calls LLM, updates history.
@@ -18,8 +18,8 @@ def generate_completion(
     logger.info(f"Sending message to LLM... (image={'yes' if image else 'no'})")
     logger.info(f"Request: {question}")
 
-    system_message = SYSTEM_PROMPT
-    messages = [{"role": "system", "content": system_message}]
+    if system_prompt:
+        messages = [{"role": "system", "content": system_prompt}]
 
     if history:
         messages.extend(history.last(10))
