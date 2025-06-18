@@ -4,8 +4,8 @@ from readchar import readkey, key
 from llm.completion import generate_completion
 from llm.voice_output import speak_text
 from tui.print_wrapped import pw
-from tui.select_prompt import pick_prompt
-from tui.select_llm import select_llm
+from tui import select_prompt
+from tui import select_llm
 
 menu = """\
 
@@ -14,6 +14,7 @@ Waiting for your command...
 <enter>  • enter prompt
 '.'      • select LLM model
 '!'      • toggle voice output
+'?'      • show all preconfigured prompts
 <escape> • quit
 """
 
@@ -40,8 +41,6 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
       the first prompt selection, skipping the manual and image capture step.
     - Otherwise, the user is prompted to capture a new image, start a chat without an
       image, or quit.
-    - After the first use, initial_image is cleared to ensure normal behavior for the
-      rest of the session.
     """
 
     while True:
@@ -62,13 +61,16 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
 
         # Handle the different keys:
         if k == ".":
-            select_llm(session)
+            select_llm.select_llm(session)
             continue
         elif k == "!":
             session.voice_output_enabled = not session.voice_output_enabled
             pw(
                 f"Voice output is now {'ON' if session.voice_output_enabled else 'OFF'}."
             )
+            continue
+        elif k == "?":
+            select_prompt.show_full_menu(session)
             continue
         if k == key.SPACE:
             if not image:
@@ -77,7 +79,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             if session.do_crop:
                 image = CroppedImage(image)
             image.preview()
-            prompt = pick_prompt(session)
+            prompt = select_prompt.select_prompt(session)
         elif k == key.ENTER:
             assert image is None
             prompt = input("\nEnter your prompt: ")

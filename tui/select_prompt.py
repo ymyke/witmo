@@ -1,17 +1,25 @@
-
 from readchar import readkey, key
 from tui.print_wrapped import pw
 from session import Session
 
 
-def pick_prompt(session: Session) -> str:
-    pw("\nPick your prompt:") # TODO only do this once? no need to have this in session? (then, get rid of session param?)
-    for k, p in session.prompts.items():  
+def show_full_menu(session: Session) -> None:
+    pw("\nAll preconfigured prompts in full:\n\n")
+    for k, p in session.prompts.items():
+        pw(f"'{k}' • {p['summary']}\n{p['prompt']}\n{'-'*60}")
+
+
+def show_short_menu(session: Session) -> None:
+    pw("\nPick your prompt:")
+    for k, p in session.prompts.items():
         pw(f"'{k}' • {p['summary']} • [{p['prompt'][:60]}...]")
     pw("<enter> • enter your own prompt")
 
+
+def select_prompt(session: Session) -> str:
+    show_short_menu(session)
     while True:
-        k = readkey()  
+        k = readkey()
         if k == key.ENTER:
             while True:
                 prompt = input("\nEnter your prompt: ").strip()
