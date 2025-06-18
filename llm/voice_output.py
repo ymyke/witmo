@@ -1,7 +1,7 @@
 import os
+import sys
 import uuid
 from loguru import logger
-import pygame
 import tempfile
 import threading
 from print_utils import pw
@@ -27,6 +27,11 @@ def speak_text(text: str, voice: str = "alloy") -> None:
             pygame.mixer.music.play()
         except Exception as e:
             logger.error(f"TTS error: {e}")
+
+    # Import pygame only when we need it:
+    if not "pygame" in sys.modules:
+        os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+        import pygame
 
     pw("Generating and playing voice output in the background...")
     if not pygame.mixer.get_init():
