@@ -6,7 +6,7 @@ from slugify import slugify
 from llm import system_prompt
 from llm.history import History
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
-from print_utils import pw
+from tui.print_wrapped import pw
 from camera.camera_protocol import CameraProtocol
 
 

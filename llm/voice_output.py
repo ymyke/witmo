@@ -4,7 +4,7 @@ import uuid
 from loguru import logger
 import tempfile
 import threading
-from print_utils import pw
+from tui.print_wrapped import pw
 
 
 def speak_text(text: str, voice: str = "alloy") -> None:

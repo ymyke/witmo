@@ -4,7 +4,7 @@ from wakepy import keep
 from argparsing import parse
 from session import Session
 from mainloop import mainloop
-from print_utils import pw
+from tui.print_wrapped import pw
 from image import BasicImage
 
 main_greeting = """\

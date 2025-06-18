@@ -1,10 +1,12 @@
 from image import CroppedImage, BasicImage, Image
 from session import Session
 from readchar import readkey, key
-from print_utils import pw
 from llm.completion import generate_completion
 from llm.models import model_manager
 from llm.voice_output import speak_text
+from tui.print_wrapped import pw
+from tui.pick_prompt import pick_prompt
+from tui.select_llm import select_llm
 
 menu = """\
 
@@ -45,6 +47,8 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
 
     voice_output_enabled = False
     while True:
+
+        # Setup, show menu, handle special case where initial_image is provided:
         prompt = None
         image: Image | None = None
         if initial_image:
@@ -56,25 +60,14 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             pw(f"[Voice: {voice_state}, LLM: {model_manager.current_model.shortname}]")
             k = readkey()
 
+        # Handle the different keys:
         if k == ".":
-            while True:
-                pw(model_manager.as_menu())
-                llmkey = readkey()
-                if model_manager.has_key(llmkey):
-                    model_manager.set_current_model_by_key(llmkey)
-                    pw(f"LLM set to: {model_manager.current_model.name}")
-                    break
-                elif llmkey == key.ESC:
-                    break
-                else:
-                    pw("Unknown key. Please select 3, 4, 5, or <escape>.")
+            select_llm()
             continue
-
         elif k == "!":
             voice_output_enabled = not voice_output_enabled
             pw(f"Voice output is now {'ON' if voice_output_enabled else 'OFF'}.")
             continue
-
         if k == key.SPACE:
             if not image:
                 pw("Capturing image...")
@@ -82,39 +75,21 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             if session.do_crop:
                 image = CroppedImage(image)
             image.preview()
-
-            pw("\nPick your prompt:")
-            for k, p in session.prompts.items():  # TODO use different k
-                pw(f"'{k}' • {p['summary']} • [{p['prompt'][:60]}...]")
-            pw("<enter> • enter your own prompt")
-
-            while True:
-                k = readkey()  # TODO use different k
-                if k == key.ENTER:
-                    prompt = input("\nEnter your prompt: ")
-                    break
-                elif k.lower() in session.prompts:
-                    prompt = session.prompts[k]["prompt"]
-                    pw(f"\nUsing prompt: {session.prompts[k]['summary']}")
-                    break
-
-                pw(f"Unknown key. Please select a valid option from the list.")
-
+            prompt = pick_prompt(session)
         elif k == key.ENTER:
             assert image is None
             prompt = input("\nEnter your prompt: ")
-
         elif k == key.ESC:
             break
-
         else:
             pw(f"Unknown key. Please select a valid option.")
             continue
 
-        if prompt.strip().lower() in ["exit", "quit", "bye", "q"]:
-            # Just in case the user wanted to quit after pressing enter
+        # Let the user quit after pressing enter:
+        if prompt.lower() in ["quit", "q", "exit", "cancel"]:
             continue
 
+        # Now talk to the LLM(s):
         assert prompt is not None
         pw(chat_request_pattern.format(request=prompt))
         response = generate_completion(

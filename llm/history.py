@@ -1,7 +1,7 @@
 import os
 import json
 from loguru import logger
-from print_utils import pw
+from tui.print_wrapped import pw
 
 
 class History:
