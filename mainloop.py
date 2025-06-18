@@ -5,7 +5,7 @@ from llm.completion import generate_completion
 from llm.models import model_manager
 from llm.voice_output import speak_text
 from tui.print_wrapped import pw
-from tui.pick_prompt import pick_prompt
+from tui.select_prompt import pick_prompt
 from tui.select_llm import select_llm
 
 menu = """\
