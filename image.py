@@ -111,7 +111,7 @@ class CroppedImage(Image):
         detected TV, or full image if not found.
         """
         logger.debug("Finding screen...")
-        results = self._yolo_model(img)
+        results = self._yolo_model(img, verbose=False)
         for r in results:
             for b in r.boxes:
                 if int(b.cls[0]) == self._tv_class_id:
