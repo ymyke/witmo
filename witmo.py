@@ -26,18 +26,14 @@ def start_witmo() -> None:
     logger.add(sys.stderr, level=args.log_level)
 
     session = Session.from_args(args)
-    logger.debug("Loading history...")
-    session.history.load()
 
     pw(main_greeting.format(game_name=args.game_name))
 
     logger.info("Deactivating sleep mode and screen lock until end of session...")
-    with session.camera, keep.presenting():
+    with session.history, session.camera, keep.presenting():
         image = BasicImage(args.initial_image) if args.initial_image else None
         mainloop(session, image)
 
-    pw("\n🔄 Saving chat history...")
-    session.history.save()
     pw("\n👋 Thanks for using Witmo!")
 
 

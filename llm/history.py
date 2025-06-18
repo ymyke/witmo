@@ -1,6 +1,7 @@
 import os
 import json
 from loguru import logger
+from print_utils import pw
 
 
 class History:
@@ -59,3 +60,13 @@ class History:
 
     def __len__(self):
         return len(self.messages)
+
+    def __enter__(self):
+        pw("Loading chat history...")
+        self.load()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pw("Saving chat history...")
+        self.save()
+        return False
