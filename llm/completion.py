@@ -1,4 +1,3 @@
-import os
 from loguru import logger
 from image import Image
 from .history import History
