@@ -77,6 +77,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
 
         if k == key.SPACE:
             if not image:
+                pw("Capturing image...")
                 image = session.camera.capture()
             if session.do_crop:
                 image = CroppedImage(image)
