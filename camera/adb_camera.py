@@ -27,6 +27,8 @@ class CameraError(Exception):
 class AdbCamera(CameraProtocol):
     """A simple class for capturing images via ADB USB connection"""
 
+    CAMERA_DIR = "/sdcard/DCIM/Camera"
+
     def __init__(self, do_delete_remote: bool = False, output_dir="captures"):
         """
         Initialize the AdbCamera
@@ -115,9 +117,9 @@ class AdbCamera(CameraProtocol):
             str: Path to the latest image file on device
         """
         output = self.device.shell(
-            "ls -t /sdcard/DCIM/Camera | head -n1"
-        ).strip()  # TODO path
-        return f"/sdcard/DCIM/Camera/{output}"
+            f"ls -t {self.CAMERA_DIR} | head -n1"
+        ).strip()
+        return f"{self.CAMERA_DIR}/{output}"
 
     def assert_running(self) -> None:
         """Ensure the camera app is running on the device."""
