@@ -32,11 +32,5 @@ class ModelManager:
     def has_key(self, key) -> bool:
         return key in self._models
 
-    def as_menu(self) -> str:   # TODO maybe to mainloop?
-        menu = "\nSelect LLM model:\n"
-        for key, model in self._models.items():
-            appendix = " (CURRENT)" if key == self._current_key else ""
-            menu += f"{key} = {model.name}{appendix}\n"
-        return menu
 
 
