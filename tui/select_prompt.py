@@ -6,14 +6,14 @@ from session import Session
 def show_full_menu(session: Session) -> None:
     pw("\nAll preconfigured prompts in full:\n\n")
     for k, p in session.prompts.items():
-        pw(f"'{k}' • {p['summary']}\n{p['prompt']}\n{'-'*60}")
+        pw(f"{k} = {p['summary']}\n{p['prompt']}\n{'-'*60}")
 
 
 def show_short_menu(session: Session) -> None:
     pw("\nPick your prompt:")
     for k, p in session.prompts.items():
-        pw(f"'{k}' • {p['summary']} • [{p['prompt'][:60]}...]")
-    pw("<enter> • enter your own prompt")
+        pw(f"{k} = {p['summary']}   [{p['prompt'][:60]}...]")
+    pw("enter = enter your own prompt")
 
 
 def select_prompt(session: Session) -> str:

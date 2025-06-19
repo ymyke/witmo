@@ -13,8 +13,9 @@ main_greeting = """\
 ============================================================
                       GAME: {game_name}
 ------------------------------------------------------------
-• Capture gameplay, get advice, and chat with your AI coach
+• Capture gameplay situations and get advice
 • Conversation history is maintained for context
+• Spoiler-free by default, but can be configured
 ------------------------------------------------------------
 """
 

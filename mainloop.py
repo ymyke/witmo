@@ -10,12 +10,13 @@ from tui import select_llm
 menu = """\
 
 Waiting for your command...
-<space>  • capture a new image
-<enter>  • enter prompt
-'.'      • select LLM model
-'!'      • toggle voice output
-'?'      • show all preconfigured prompts
-<escape> • quit
+ space = capture a new image
+ enter = enter free-text prompt
+     ? = show all preconfigured prompts
+     ^ = pick preconfigured prompt and send it
+     . = select LLM model
+     ! = toggle voice output
+   esc = quit
 """
 
 chat_request_pattern = """\
@@ -53,9 +54,10 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = key.SPACE
         else:
             pw(menu)
-            voice_state = "ON" if session.voice_output_enabled else "OFF"
             pw(
-                f"[Voice: {voice_state}, LLM: {session.model_manager.current_model.shortname}]"
+                f"[Voice: {'ON' if session.voice_output_enabled else 'OFF'} • "
+                f"LLM: {session.model_manager.current_model.shortname} • "
+                f"Crop: {'ON' if session.do_crop else 'OFF'}]\n"
             )
             k = readkey()
 
@@ -79,6 +81,8 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             if session.do_crop:
                 image = CroppedImage(image)
             image.preview()
+            prompt = select_prompt.select_prompt(session)
+        elif k == "^":
             prompt = select_prompt.select_prompt(session)
         elif k == key.ENTER:
             assert image is None

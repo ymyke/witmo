@@ -28,7 +28,6 @@ class ModelManager:
             self._current_key = key
         else:
             raise ValueError(f"Unknown model key: {key}")
-        print(f"LLM set to: {self.current_model.name} ({self.current_model.shortname})")
 
     def has_key(self, key) -> bool:
         return key in self._models
@@ -37,7 +36,7 @@ class ModelManager:
         menu = "\nSelect LLM model:\n"
         for key, model in self._models.items():
             appendix = " (CURRENT)" if key == self._current_key else ""
-            menu += f"{key} • {model.name}{appendix}\n"
+            menu += f"{key} = {model.name}{appendix}\n"
         return menu
 
 
