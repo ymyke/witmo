@@ -13,9 +13,7 @@ class ModelManager:
         self._models: dict[str, Model] = {
             "3": Model(shortname="o3", name="OpenAI o3", api_name="o3"),
             "4": Model(shortname="4o", name="OpenAI 4o", api_name="gpt-4o"),
-            "5": Model(
-                shortname="4.5", name="OpenAI 4.5", api_name="gpt-4.5-preview"
-            ),
+            "5": Model(shortname="4.5", name="OpenAI 4.5", api_name="gpt-4.5-preview"),
         }
         self._current_key = self._models.keys().__iter__().__next__()
 
@@ -31,6 +29,3 @@ class ModelManager:
 
     def has_key(self, key) -> bool:
         return key in self._models
-
-
-
