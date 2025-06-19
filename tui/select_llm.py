@@ -4,16 +4,16 @@ from session import Session
 
 
 def show_menu(session):
-    menu = "\nSelect LLM model:\n"
+    pw("\nSelect LLM model:")
     for key, model in session.model_manager._models.items():
         appendix = " (CURRENT)" if key == session.model_manager._current_key else ""
-        menu += f"{key} = {model.name}{appendix}\n"
-    return menu
+        pw(f"{key} = {model.name}{appendix}")
+    pw()
 
 
 def select_llm(session: Session) -> None:
     while True:
-        pw(show_menu(session))
+        show_menu(session)
         k = readkey()
         if session.model_manager.has_key(k):
             session.model_manager.set_current_model_by_key(k)

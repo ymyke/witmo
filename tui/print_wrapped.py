@@ -2,8 +2,11 @@ import textwrap
 import re
 
 
-def pw(text, width=100, **kwargs):
+def pw(text=None, width=100, **kwargs):
     "Print wrapped"
+    if text is None:
+        print()
+        return
     if not isinstance(text, str):
         text = str(text)
     bullet_regex = re.compile(r"^(\s*)([\d]+[.)]|[\-•])\s+")

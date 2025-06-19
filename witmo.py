@@ -8,6 +8,8 @@ from tui.print_wrapped import pw
 from image import BasicImage
 
 main_greeting = """\
+
+
 ============================================================
                 🎮 WITMO - G{{AI}}MING COACH 🎮
 ============================================================
@@ -17,6 +19,8 @@ main_greeting = """\
 • Conversation history is maintained for context
 • Spoiler-free by default, but can be configured
 ------------------------------------------------------------
+
+
 """
 
 
@@ -35,7 +39,7 @@ def start_witmo() -> None:
         image = BasicImage(args.initial_image) if args.initial_image else None
         mainloop(session, image)
 
-    pw("\n👋 Thanks for using Witmo!")
+    pw("\n👋 Thanks for using Witmo!\n\n")
 
 
 if __name__ == "__main__":

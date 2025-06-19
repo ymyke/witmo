@@ -17,20 +17,21 @@ Waiting for your command...
      . = select LLM model
      ! = toggle voice output
    esc = quit
+
 """
 
 chat_request_pattern = """\
-Request:
-------------------------------------------------------------
+----- Request: ---------------------------------------------
 {request}
 ------------------------------------------------------------
+
 """
 
 chat_response_pattern = """\
-Response:
-============================================================
+===== Response: ============================================
 {response}
 ============================================================
+
 """
 
 
@@ -57,7 +58,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             pw(
                 f"[Voice: {'ON' if session.voice_output_enabled else 'OFF'} • "
                 f"LLM: {session.model_manager.current_model.shortname} • "
-                f"Crop: {'ON' if session.do_crop else 'OFF'}]\n"
+                f"Crop: {'ON' if session.do_crop else 'OFF'}]\n\n"
             )
             k = readkey()
 
@@ -79,6 +80,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
                 pw("Capturing image...")
                 image = session.camera.capture()
             if session.do_crop:
+                pw("Cropping...")
                 image = CroppedImage(image)
             image.preview()
             prompt = select_prompt.select_prompt(session)
@@ -87,6 +89,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
         elif k == key.ENTER:
             assert image is None
             prompt = input("\nEnter your prompt: ")
+            pw()
         elif k == key.ESC:
             break
         else:
@@ -107,8 +110,9 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             image=image,
             model=session.model_manager.current_model.api_name,
         )
-        pw(f"Waiting for a response...")
+        pw(f"Waiting for a response...\n\n")
         pw(chat_response_pattern.format(response=response))
         if session.voice_output_enabled:
             speak_text(response)
         image = None
+        pw()
