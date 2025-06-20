@@ -28,6 +28,7 @@ PRIO2COLOR = {
     "low": "#78909C",  # Slate
 }
 ERROR_ACCENT = "#E06C75"  # Coral Red'ish
+WARN_ACCENT = "#FFB86C"  # Light Orange
 
 # Globals:
 _console = Console()
@@ -38,14 +39,16 @@ PANEL_NARROW_WIDTH = 90
 PANEL_WIDE_WIDTH = 140
 
 
-def tt(thing=None, style: Literal["error"] | None = None) -> None:
+def tt(thing=None, style: Literal["error", "warning"] | None = None) -> None:
     """Transient tui output."""
     thing = thing or ""
     if isinstance(thing, str):
-        if style == "error":
-            thing = Text(str(thing), style=ERROR_ACCENT, justify="center")
-        else:
-            thing = Text(str(thing), style=MUTED, justify="center")
+        stylemap = {
+            "error": ERROR_ACCENT,
+            "warning": WARN_ACCENT,
+        }
+        style_ = stylemap.get(str(style), MUTED)
+        thing = Text(str(thing), style=style_, justify="center")
     _to.add(thing)
 
 
