@@ -22,33 +22,36 @@ class ExtendedTextArea(TextArea):
 class TextInputApp(App):
     CSS = """
     Vertical {
-      align: center middle;
+      align: right middle;
       height: 100%;
     }
 
+    #modal {
+      align: right middle;
+      width: 80;
+      height: auto;
+    }
+
     #input-label {
-      align: center middle;
       color: #3366FF;
-      text-align: center;
-      width: 100%;
+      text-align: left;
       margin-bottom: 1;
     }
 
     #editor-container {
-      align: center middle;
       height: auto;
     }
 
     TextArea {
-      width: 60;
+      width: 78;
       height: 10;
       border: round #3366FF;    
       text-wrap: wrap;
     }
 
     Horizontal#buttons {
-      align: center middle;
       height: auto;
+      margin-top: 1;
       margin-right: 2;
     }
 
@@ -56,10 +59,12 @@ class TextInputApp(App):
       background: #3366FF;
       color: white;
     }
+
     Button#cancel {
       background: #B3B3B3;
       color: black;
     }
+    
     Button {
       width: auto;
       margin-top: 1;
@@ -73,14 +78,15 @@ class TextInputApp(App):
 
     def compose(self) -> ComposeResult:
         with Vertical():
-            yield Label(self.label_text, id="input-label")
-            with Horizontal(id="editor-container"):
-                self.textarea = ExtendedTextArea(id="editor")
-                yield self.textarea
+            with Vertical(id="modal"):
+              yield Label(self.label_text, id="input-label")
+              with Horizontal(id="editor-container"):
+                  self.textarea = ExtendedTextArea(id="editor")
+                  yield self.textarea
 
-            with Horizontal(id="buttons"):
-                yield Button("Submit\n(ctrl+s)", id="submit")
-                yield Button("Cancel\n(ctrl+q)", id="cancel")
+              with Horizontal(id="buttons"):
+                  yield Button("Submit\n(ctrl+s)", id="submit")
+                  yield Button("Cancel\n(ctrl+q)", id="cancel")
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "submit":
