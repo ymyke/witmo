@@ -23,7 +23,7 @@ class Session:
     camera: CameraProtocol
     prompts: dict[str, dict]
     do_crop: bool
-    audio_mode: AudioMode  
+    audio_mode: AudioMode
     model_manager: ModelManager
 
     @classmethod
@@ -78,15 +78,19 @@ class Session:
         with open("prompt_map.json", "r", encoding="utf-8") as f:
             promptmap = json.load(f)
         promptlist = promptmap.get(obj.game_name_slug, [])
+        if not promptlist:
+            msg = f"No prompts found for game '{args.game_name}'. Trying default prompts."
+            logger.warning(msg)
+            tt(msg, style="warning")
+            promptlist = promptmap.get("default", [])
+        if not promptlist:
+            msg = "No default prompts found either. Check 'prompt_map.json'."
+            logger.warning(msg)
+            tt(msg, style="error")
         obj.prompts = {
             item["key"]: item for item in sorted(promptlist, key=lambda x: x["key"])
         }
-        if not obj.prompts:
-            logger.warning(
-                f"No prompts found for game '{args.game_name}'. "
-                "You can add them to 'prompt_map.json'."
-            )
-        else:
+        if obj.prompts:
             tt(f"Loaded {len(obj.prompts)} prompts for game '{args.game_name}'.")
 
         # Whether to crop the images:

@@ -35,5 +35,42 @@
             "summary": "Joke",
             "key": "j"
         }
+    ],
+    "default": [
+        {
+            "prompt": "Describe what’s happening in this game situation. What should I be aware of?",
+            "summary": "General understanding",
+            "key": "g"
+        },
+        {
+            "prompt": "What’s the most important, non-obvious tip for this moment/situation?",
+            "summary": "Hint",
+            "key": "h"
+        },
+        {
+            "prompt": "Give me relevant story, lore, or context I might have missed so far.",
+            "summary": "Background",
+            "key": "b"
+        },
+        {
+            "prompt": "Which items or resources should I keep, use, or get rid of?",
+            "summary": "Inventory advice",
+            "key": "s"
+        },
+        {
+            "prompt": "Is my current equipment or setup good for this stage? Should I look for upgrades?",
+            "summary": "Equipment evaluation",
+            "key": "w"
+        },
+        {
+            "prompt": "What useful things can I make or do with what I have right now?",
+            "summary": "Crafting ideas",
+            "key": "c"
+        },
+        {
+            "prompt": "Tell me a very funny joke that only works with this game and is specific to this situation.",
+            "summary": "Joke",
+            "key": "j"
+        }
     ]
 }
