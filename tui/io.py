@@ -2,6 +2,8 @@
 
 import re
 import time
+import threading
+from contextlib import contextmanager
 from typing import Literal
 from rich.console import Console
 from rich.panel import Panel
@@ -165,3 +167,20 @@ def dot_animation(stop_event, interval=0.4):
         i += 1
         time.sleep(interval)
     _to.clear()
+
+
+@contextmanager
+def background_animation(target, *args, **kwargs):
+    """Context manager to run an animation in a background thread while executing a
+    block.
+    """
+    stop_event = threading.Event()
+    thread = threading.Thread(
+        target=target, args=(stop_event, *args), daemon=True, **kwargs
+    )
+    thread.start()
+    try:
+        yield
+    finally:
+        stop_event.set()
+        thread.join()

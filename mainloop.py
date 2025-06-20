@@ -1,4 +1,3 @@
-import threading
 from image import CroppedImage, BasicImage, Image
 from session import Session
 from readchar import readkey, key
@@ -13,6 +12,7 @@ from tui.io import (
     response_panel,
     get_textinput,
     dot_animation,
+    background_animation,
 )
 from tui.audio import play_ding, speak_text
 
@@ -97,14 +97,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
         tp(request_panel(prompt))
         tt("Waiting for a response...")
 
-        # Wait for response, including animation in background thread:
-        # TODO Can this be refactored nicely?
-        stop_event = threading.Event()
-        anim_thread = threading.Thread(
-            target=dot_animation, args=(stop_event,), daemon=True
-        )
-        anim_thread.start()
-        try:
+        with background_animation(dot_animation):
             response = generate_completion(
                 prompt,
                 history=session.history,
@@ -112,9 +105,6 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
                 image=image,
                 model=session.model_manager.current_model.api_name,
             )
-        finally:
-            stop_event.set()
-            anim_thread.join()
 
         tp(response_panel(response))
 
