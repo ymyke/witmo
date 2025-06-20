@@ -1,5 +1,6 @@
 """Terminal user interface (TUI) output and input."""
 
+import re
 import time
 from typing import Literal
 from rich.console import Console
@@ -84,6 +85,9 @@ def request_panel(txt: str) -> Align:
 
 
 def response_panel(txt: str) -> Align:
+    # Convert '•' bullets to Markdown format:
+    txt = re.sub(r"^(\s*)•", r"\1- ", txt, flags=re.MULTILINE)
+
     return Align(
         Panel(
             Markdown(txt, style=TEXT),
