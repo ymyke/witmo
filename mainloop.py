@@ -17,15 +17,16 @@ from tui.io import (
 from tui.audio import play_ding, speak_text
 
 
-main_menu = {
-    "space": "capture a new image",
-    "enter": "enter free-text prompt",
-    "?": "show all preconfigured prompts",
-    "^": "pick preconfigured prompt and send it",
-    ".": "select LLM",
-    "!": "cycle audio mode",
-    "esc": "quit",
-}
+main_menu = [
+    ("space", "capture a new image"),
+    ("enter", "enter free-text prompt"),
+    ("", ""),
+    ("p", "pick preconfigured prompt and send it"),
+    ("c", "show latest capture again"),
+    ("m", "select LLM"),
+    ("a", "cycle audio mode"),
+    ("esc", "quit"),
+]
 
 
 def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
@@ -38,6 +39,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
       image, or quit.
     """
 
+    last_image: Image | None = None  # Save the last capture so it can be shown again
     while True:
 
         # Setup, show menu, handle special case where initial_image is provided:
@@ -48,7 +50,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = key.SPACE
         else:
             tt()
-            tt(menu_panel("Main menu", list(main_menu.items()), "top"))
+            tt(menu_panel("Main menu", main_menu, "top"))
             state_str = (
                 f"[Audio: {session.audio_mode.mode.upper()} • "
                 f"LLM: {session.model_manager.current_model.shortname} • "
@@ -58,26 +60,31 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = readkey()
 
         # Handle the different keys:
-        if k == ".":
+        if k == "m":
             select_llm.select_llm(session)
             continue
-        elif k == "!":
+        elif k == "a":
             session.audio_mode.cycle()
             tt(f"Audio mode is now: {session.audio_mode.mode.upper()}.")
             continue
-        elif k == "?":
-            select_prompt.show_full_menu(session)
+        elif k == "c":
+            if last_image:
+                tt("Showing last capture...")
+                last_image.preview()
+            else:
+                tt("No last capture available (in the current session).", style="error")
             continue
         if k == key.SPACE:
             if not image:
                 tt("Capturing image...")
                 image = session.camera.capture()
+                last_image = image  # Save the last capture for potential reuse
             if session.do_crop:
                 tt("Cropping...")
                 image = CroppedImage(image)
             image.preview()
             prompt = select_prompt.select_prompt(session)
-        elif k == "^":
+        elif k == "p":
             prompt = select_prompt.select_prompt(session)
         elif k == key.ENTER:
             assert image is None
@@ -109,7 +116,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
         tp(response_panel(response))
 
         if session.audio_mode.should_ding():
-            play_ding()  
+            play_ding()
 
         if session.audio_mode.should_voice():
             tt("Generating voice output (in the background)...")
