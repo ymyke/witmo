@@ -88,9 +88,6 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             tt("Unknown key. Please select a valid option.", style="error")
             continue
 
-        # Let the user quit after pressing enter:
-        if prompt.lower() in ["quit", "q", "exit", "cancel"]:   # TODO obsolete?
-            continue
         if not prompt:
             tt("No prompt provided. Back to main menu.", style="error")
             continue
