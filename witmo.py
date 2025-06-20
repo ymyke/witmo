@@ -4,42 +4,48 @@ from wakepy import keep
 from argparsing import parse
 from session import Session
 from mainloop import mainloop
-from tui.print_wrapped import pw
 from image import BasicImage
+from tui.io import tt, tp, welcome_panel
 
-main_greeting = """\
+greeting_pattern = """\
+🎮🎓 WITMO - G{{AI}}MING COACH 🎓🎮
 
-
-============================================================
-                🎮 WITMO - G{{AI}}MING COACH 🎮
-============================================================
-                      GAME: {game_name}
-------------------------------------------------------------
 • Capture gameplay situations and get advice
 • Conversation history is maintained for context
-• Spoiler-free by default, but can be configured
-------------------------------------------------------------
+• Spoiler-free by default, but that can be configured
+• Run `witmo --help` for more info or check out the README
 
 
-"""
+You're playing:
+
+🤜 {game_name} 🤛
+
+Enjoy!"""
 
 
 def start_witmo() -> None:
-    logger.debug("Starting Witmo...")
     args = parse()
     logger.remove()
     logger.add(sys.stderr, level=args.log_level)
+    logger.debug("Starting Witmo...")
+
+    greeting = greeting_pattern.format(game_name=args.game_name.upper())
+    tp(welcome_panel(greeting))
 
     session = Session.from_args(args)
 
-    pw(main_greeting.format(game_name=args.game_name))
-
-    logger.info("Deactivating sleep mode and screen lock until end of session...")
+    tt(
+        "Deactivating sleep mode and screen lock on PC and phone, also dimming phone screen..."
+    )
     with session.history, session.camera, keep.presenting():
         image = BasicImage(args.initial_image) if args.initial_image else None
         mainloop(session, image)
+        tt(
+            "Restoring sleep mode and screen lock on PC and phone, "
+            "also restoring phone screen brightness..."
+        )
 
-    pw("\n👋 Thanks for using Witmo!\n\n")
+    tp(welcome_panel("👋 Thanks for using Witmo!"))
 
 
 if __name__ == "__main__":

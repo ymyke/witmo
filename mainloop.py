@@ -1,38 +1,31 @@
+import threading
 from image import CroppedImage, BasicImage, Image
 from session import Session
 from readchar import readkey, key
 from llm.completion import generate_completion
 from llm.voice_output import speak_text
-from tui.print_wrapped import pw
 from tui import select_prompt
 from tui import select_llm
+from tui.io import (
+    tt,
+    tp,
+    menu_panel,
+    request_panel,
+    response_panel,
+    get_textinput,
+    dot_animation,
+)
 
-menu = """\
 
-Waiting for your command...
- space = capture a new image
- enter = enter free-text prompt
-     ? = show all preconfigured prompts
-     ^ = pick preconfigured prompt and send it
-     . = select LLM model
-     ! = toggle voice output
-   esc = quit
-
-"""
-
-chat_request_pattern = """\
------ Request: ---------------------------------------------
-{request}
-------------------------------------------------------------
-
-"""
-
-chat_response_pattern = """\
-===== Response: ============================================
-{response}
-============================================================
-
-"""
+main_menu = {
+    "space": "capture a new image",
+    "enter": "enter free-text prompt",
+    "?": "show all preconfigured prompts",
+    "^": "pick preconfigured prompt and send it",
+    ".": "select LLM",
+    "!": "toggle voice output",
+    "esc": "quit",
+}
 
 
 def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
@@ -54,12 +47,14 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             image = initial_image
             k = key.SPACE
         else:
-            pw(menu)
-            pw(
+            tt()
+            tt(menu_panel("Main menu", list(main_menu.items()), "top"))
+            state_str = (
                 f"[Voice: {'ON' if session.voice_output_enabled else 'OFF'} • "
                 f"LLM: {session.model_manager.current_model.shortname} • "
-                f"Crop: {'ON' if session.do_crop else 'OFF'}]\n\n"
+                f"Crop: {'ON' if session.do_crop else 'OFF'}]"
             )
+            tt(state_str)
             k = readkey()
 
         # Handle the different keys:
@@ -68,19 +63,18 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             continue
         elif k == "!":
             session.voice_output_enabled = not session.voice_output_enabled
-            pw(
-                f"Voice output is now {'ON' if session.voice_output_enabled else 'OFF'}."
-            )
+            voice_state = "ON" if session.voice_output_enabled else "OFF"
+            tt(f"Voice output is now {voice_state}.")
             continue
         elif k == "?":
             select_prompt.show_full_menu(session)
             continue
         if k == key.SPACE:
             if not image:
-                pw("Capturing image...")
+                tt("Capturing image...")
                 image = session.camera.capture()
             if session.do_crop:
-                pw("Cropping...")
+                tt("Cropping...")
                 image = CroppedImage(image)
             image.preview()
             prompt = select_prompt.select_prompt(session)
@@ -88,31 +82,48 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             prompt = select_prompt.select_prompt(session)
         elif k == key.ENTER:
             assert image is None
-            prompt = input("\nEnter your prompt: ")
-            pw()
+            prompt = get_textinput("Enter your prompt:")
         elif k == key.ESC:
             break
         else:
-            pw(f"Unknown key. Please select a valid option.")
+            tt("Unknown key. Please select a valid option.", style="error")
             continue
 
         # Let the user quit after pressing enter:
-        if prompt.lower() in ["quit", "q", "exit", "cancel"]:
+        if prompt.lower() in ["quit", "q", "exit", "cancel"]:   # TODO obsolete?
+            continue
+        if not prompt:
+            tt("No prompt provided. Back to main menu.", style="error")
             continue
 
         # Now talk to the LLM(s):
         assert prompt is not None
-        pw(chat_request_pattern.format(request=prompt))
-        response = generate_completion(
-            prompt,
-            history=session.history,
-            system_prompt=session.system_prompt,
-            image=image,
-            model=session.model_manager.current_model.api_name,
+        tp(request_panel(prompt))
+        tt("Waiting for a response...")
+
+        # Wait for response, including animation in background thread:
+        # TODO Can this be refactored nicely?
+        stop_event = threading.Event()
+        anim_thread = threading.Thread(
+            target=dot_animation, args=(stop_event,), daemon=True
         )
-        pw(f"Waiting for a response...\n\n")
-        pw(chat_response_pattern.format(response=response))
+        anim_thread.start()
+        try:
+            response = generate_completion(
+                prompt,
+                history=session.history,
+                system_prompt=session.system_prompt,
+                image=image,
+                model=session.model_manager.current_model.api_name,
+            )
+        finally:
+            stop_event.set()
+            anim_thread.join()
+
+        tp(response_panel(response))
+
         if session.voice_output_enabled:
+            tt("Generating voice output (in the background)...")
             speak_text(response)
+
         image = None
-        pw()

@@ -7,7 +7,7 @@ from llm import system_prompt
 from llm.history import History
 from llm.models import ModelManager
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
-from tui.print_wrapped import pw
+from tui.io import tt
 from camera.camera_protocol import CameraProtocol
 
 
@@ -86,7 +86,7 @@ class Session:
                 "You can add them to 'prompt_map.json'."
             )
         else:
-            pw(f"Loaded {len(obj.prompts)} prompts for game '{args.game_name}'.")
+            tt(f"Loaded {len(obj.prompts)} prompts for game '{args.game_name}'.")
 
         # Whether to crop the images:
         obj.do_crop = getattr(args, "crop", False)

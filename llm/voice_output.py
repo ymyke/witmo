@@ -4,7 +4,6 @@ import uuid
 from loguru import logger
 import tempfile
 import threading
-from tui.print_wrapped import pw
 
 
 def speak_text(text: str, voice: str = "alloy") -> None:
@@ -34,7 +33,6 @@ def speak_text(text: str, voice: str = "alloy") -> None:
     if "openai_client" not in sys.modules:
         from .openai_client import openai_client
 
-    pw("Generating and playing voice output in the background...")
     if not pygame.mixer.get_init():
         pygame.mixer.init()
     threading.Thread(target=_tts_and_play, args=(text, voice), daemon=True).start()

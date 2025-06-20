@@ -1,38 +1,36 @@
 from readchar import readkey, key
-from tui.print_wrapped import pw
 from session import Session
+from tui.io import tt, menu_panel, get_textinput
 
 
 def show_full_menu(session: Session) -> None:
-    pw("\nAll preconfigured prompts in full:\n\n")
+    m = []
     for k, p in session.prompts.items():
-        pw(f"{k} = {p['summary']}\n{p['prompt']}\n{'-'*60}")
-    pw()
+        m.append((k, p["summary"]))
+        m.append(("", p["prompt"]))
+    tt(menu_panel("Preconfigured prompts", m, "low"))
 
 
 def show_short_menu(session: Session) -> None:
-    pw("\nPick your prompt:")
+    m = []
     for k, p in session.prompts.items():
-        pw(f"{k} = {p['summary']}   [{p['prompt'][:60]}...]")
-    pw("enter = enter your own prompt\n\n")
+        m.append((k, p["summary"], p["prompt"][:60] + "..."))
+    m.append(("enter", "enter your own prompt"))
+    tt(menu_panel("Pick a prompt", m, "med"))
 
 
 def select_prompt(session: Session) -> str:
+    tt()
     show_short_menu(session)
     while True:
         k = readkey()
         if k == key.ENTER:
-            while True:
-                prompt = input("\nEnter your prompt: ").strip()
-                pw()
-                if prompt:
-                    break
-                pw("Please enter a prompt. Or enter 'q' to cancel.\n\n")
+            prompt = get_textinput("Enter your prompt:")
             break
         elif k.lower() in session.prompts:
             prompt = session.prompts[k]["prompt"]
-            pw(f"\nUsing prompt: {session.prompts[k]['summary']}\n\n")
+            tt(f"\nUsing prompt: {session.prompts[k]['summary']}\n\n")
             break
-        pw(f"Unknown key. Please select a valid option from the list.")
+        tt(f"Unknown key. Please select a valid option from the list.", style="error")
 
     return prompt

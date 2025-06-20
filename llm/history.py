@@ -1,8 +1,7 @@
 import os
 import json
 from loguru import logger
-from tui.print_wrapped import pw
-
+from tui.io import tt
 
 class History:
     def __init__(self, file_location: str, file_name: str = "chat_history.json"):
@@ -62,11 +61,11 @@ class History:
         return len(self.messages)
 
     def __enter__(self):
-        pw("Loading chat history...")
         self.load()
+        tt(f"Loaded chat history with {len(self.messages)} messages")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pw("Saving chat history...")
         self.save()
+        tt(f"Saved chat history with {len(self.messages)} messages")
         return False
