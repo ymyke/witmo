@@ -29,6 +29,11 @@
             "prompt": "What are some really useful things I can craft with the items I have?",
             "summary": "Crafting ideas",
             "key": "c"
+        },
+        {
+            "prompt": "What is a very funny joke that is specific to this situtation?",
+            "summary": "Joke",
+            "key": "j"
         }
     ]
 }
