@@ -40,6 +40,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
     """
 
     last_image: Image | None = None  # Save the last capture so it can be shown again
+    suppress_menu = False  # Suppress the main menu in certain cases
     while True:
 
         # Setup, show menu, handle special case where initial_image is provided:
@@ -50,14 +51,16 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             k = key.SPACE
         else:
             tt()
-            tt(menu_panel("Main menu", main_menu, "top"))
-            state_str = (
-                f"[Audio: {session.audio_mode.mode.upper()} • "
-                f"LLM: {session.model_manager.current_model.shortname} • "
-                f"Crop: {'ON' if session.do_crop else 'OFF'}]"
-            )
-            tt(state_str)
+            if not suppress_menu:
+                tt(menu_panel("Main menu", main_menu, "top"))
+                state_str = (
+                    f"[Audio: {session.audio_mode.mode.upper()} • "
+                    f"LLM: {session.model_manager.current_model.shortname} • "
+                    f"Crop: {'ON' if session.do_crop else 'OFF'}]"
+                )
+                tt(state_str)
             k = readkey()
+        suppress_menu = False
 
         # Handle the different keys:
         if k == "m":
@@ -66,6 +69,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
         elif k == "a":
             session.audio_mode.cycle()
             tt(f"Audio mode is now: {session.audio_mode.mode.upper()}.")
+            suppress_menu = True
             continue
         elif k == "c":
             if last_image:
@@ -73,6 +77,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
                 last_image.preview()
             else:
                 tt("No last capture available (in the current session).", style="error")
+            suppress_menu = True
             continue
         if k == key.SPACE:
             if not image:
@@ -93,6 +98,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             break
         else:
             tt("Unknown key. Please select a valid option.", style="error")
+            suppress_menu = True
             continue
 
         if not prompt:
