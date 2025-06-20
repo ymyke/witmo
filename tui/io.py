@@ -27,10 +27,13 @@ PRIO2COLOR = {
 }
 ERROR_ACCENT = "#E06C75"  # Coral Red'ish
 
-
 # Globals:
 _console = Console()
 _to = TransientOutputter(muted_color=MUTED)
+
+# Dimensions:
+PANEL_NARROW_WIDTH = 90
+PANEL_WIDE_WIDTH = 140
 
 
 def tt(thing=None, style: Literal["error"] | None = None) -> None:
@@ -78,19 +81,45 @@ def request_panel(txt: str) -> Align:
             title_align="right",
             padding=(1, 2),
             expand=False,
-            width=90,
+            width=PANEL_NARROW_WIDTH,
         ),
         align="right",
     )
+
+
+def count_rendered_lines(txt: str, width: int) -> int:
+    """Count the number of lines of a virtually rendered Markdown text."""
+    md = Markdown(txt, style=TEXT)
+    options = _console.options.update(width=width)
+    lines = list(_console.render_lines(md, options, pad=False))
+    return len(lines)
 
 
 def response_panel(txt: str) -> Align:
     # Convert '•' bullets to Markdown format:
     txt = re.sub(r"^(\s*)•", r"\1- ", txt, flags=re.MULTILINE)
 
+    panel_lines_threshold = int(_console.size.height * 0.75)
+    rendered_line_count = count_rendered_lines(txt, PANEL_NARROW_WIDTH)
+    if rendered_line_count > panel_lines_threshold:
+        # Render in 2 columns in wider panel if it exceeds threshold:
+        lines = txt.splitlines()
+        mid = len(lines) // 2
+        col1 = "\n".join(lines[:mid])
+        col2 = "\n".join(lines[mid:])
+        table = Table.grid(expand=True, padding=(0, 3))
+        table.add_column(ratio=1)
+        table.add_column(ratio=1)
+        table.add_row(Markdown(col1, style=TEXT), Markdown(col2, style=TEXT))
+        content = table
+        panel_width = PANEL_WIDE_WIDTH
+    else:
+        content = Markdown(txt, style=TEXT)
+        panel_width = PANEL_NARROW_WIDTH
+
     return Align(
         Panel(
-            Markdown(txt, style=TEXT),
+            content,
             box=box.ROUNDED,
             style=f"on {BG}",
             border_style=RESPONSE_ACCENT,
@@ -98,7 +127,7 @@ def response_panel(txt: str) -> Align:
             title_align="left",
             padding=(1, 2),
             expand=False,
-            width=90,
+            width=panel_width,
         ),
         align="left",
     )
