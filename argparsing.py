@@ -58,6 +58,14 @@ prerequisites:
         default=False,
         help="crop images to detected TV/screen before sending to LLM",
     )
+    parser.add_argument(
+        "-a",
+        "--audio",
+        dest="audio_mode",
+        choices=["off", "voice", "ding", "both"],
+        default="off",
+        help="audio mode (default: off)",
+    )
 
     # Dev/debugging options:
     debug_group = parser.add_argument_group('dev/debugging options')

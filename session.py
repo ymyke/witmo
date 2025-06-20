@@ -8,6 +8,7 @@ from llm.history import History
 from llm.models import ModelManager
 from spoilers import parse_spoiler_args, generate_spoiler_prompt
 from tui.io import tt
+from tui.audio import AudioMode
 from camera.camera_protocol import CameraProtocol
 
 
@@ -22,7 +23,7 @@ class Session:
     camera: CameraProtocol
     prompts: dict[str, dict]
     do_crop: bool
-    voice_output_enabled: bool
+    audio_mode: AudioMode  
     model_manager: ModelManager
 
     @classmethod
@@ -91,8 +92,8 @@ class Session:
         # Whether to crop the images:
         obj.do_crop = getattr(args, "crop", False)
 
-        # Whether voice output is enabled:
-        obj.voice_output_enabled = False
+        # Audio mode:
+        obj.audio_mode = AudioMode(getattr(args, "audio_mode", "off"))
 
         # Set up model manager:
         logger.debug("Setting up model manager...")

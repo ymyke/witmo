@@ -3,7 +3,6 @@ from image import CroppedImage, BasicImage, Image
 from session import Session
 from readchar import readkey, key
 from llm.completion import generate_completion
-from llm.voice_output import speak_text
 from tui import select_prompt
 from tui import select_llm
 from tui.io import (
@@ -15,6 +14,7 @@ from tui.io import (
     get_textinput,
     dot_animation,
 )
+from tui.audio import play_ding, speak_text
 
 
 main_menu = {
@@ -23,7 +23,7 @@ main_menu = {
     "?": "show all preconfigured prompts",
     "^": "pick preconfigured prompt and send it",
     ".": "select LLM",
-    "!": "toggle voice output",
+    "!": "cycle audio mode",
     "esc": "quit",
 }
 
@@ -50,7 +50,7 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             tt()
             tt(menu_panel("Main menu", list(main_menu.items()), "top"))
             state_str = (
-                f"[Voice: {'ON' if session.voice_output_enabled else 'OFF'} • "
+                f"[Audio: {session.audio_mode.mode.upper()} • "
                 f"LLM: {session.model_manager.current_model.shortname} • "
                 f"Crop: {'ON' if session.do_crop else 'OFF'}]"
             )
@@ -62,9 +62,8 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
             select_llm.select_llm(session)
             continue
         elif k == "!":
-            session.voice_output_enabled = not session.voice_output_enabled
-            voice_state = "ON" if session.voice_output_enabled else "OFF"
-            tt(f"Voice output is now {voice_state}.")
+            session.audio_mode.cycle()
+            tt(f"Audio mode is now: {session.audio_mode.mode.upper()}.")
             continue
         elif k == "?":
             select_prompt.show_full_menu(session)
@@ -122,7 +121,10 @@ def mainloop(session: Session, initial_image: BasicImage | None = None) -> None:
 
         tp(response_panel(response))
 
-        if session.voice_output_enabled:
+        if session.audio_mode.should_ding():
+            play_ding()  
+
+        if session.audio_mode.should_voice():
             tt("Generating voice output (in the background)...")
             speak_text(response)
 
