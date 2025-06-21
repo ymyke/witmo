@@ -67,7 +67,7 @@ class Session:
             logger.info("Using TestCamera for local testing.")
             from camera.test_camera import TestCamera
 
-            obj.camera = TestCamera(args.delete_remote, obj.output_dir)
+            obj.camera = TestCamera(obj.output_dir)
         else:
             from camera.adb_camera import AdbCamera
 
