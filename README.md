@@ -5,7 +5,8 @@ Witmo is your friendly AI-powered gaming coach: it captures gameplay images, ana
 your situation, and gives you specific, spoiler-aware advice — just like a pro gamer
 buddy.
 
-![Witmo Banner](https://via.placeholder.com/800x200?text=Witmo+-+AI+Gaming+Coach)
+<img src="./assets/screenshots/witmo_menus.png" alt="Witmo main menus" style="border:1px
+solid #333; padding:10px; border-radius:4px;">
 
 
 ---
@@ -215,4 +216,13 @@ details.
   supported.
 - **LLM providers:** Only certain OpenAI language models are supported at this time.
 
+## More screenshots
+
+<img src="./assets/screenshots/main_advice_1.png" alt="Example request and response"
+style="border:1px solid #333; padding:10px; border-radius:4px;">
+
+<br/>
+
+<img src="./assets/screenshots/main_advice_2.png" alt="Example request and response"
+style="border:1px solid #333; padding:10px; border-radius:4px;">
 
