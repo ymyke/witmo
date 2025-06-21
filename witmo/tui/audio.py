@@ -30,6 +30,7 @@ def play_ding():
         os.path.join(
             os.path.dirname(__file__),
             "..",  # FIXME not really robust if file structure changes
+            "..",
             "assets",
             "sounds",
             "copper-bell-ding-2-214922.mp3",

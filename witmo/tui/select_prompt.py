@@ -1,6 +1,6 @@
 from readchar import readkey, key
-from session import Session
-from tui.io import tt, menu_panel, get_textinput
+from witmo.session import Session
+from witmo.tui.io import tt, menu_panel, get_textinput
 
 
 def show_full_menu(session: Session) -> None:

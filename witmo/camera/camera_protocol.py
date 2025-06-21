@@ -1,5 +1,5 @@
 from typing import Protocol, runtime_checkable, Any
-from image import BasicImage
+from witmo.image import BasicImage
 
 @runtime_checkable
 class CameraProtocol(Protocol):

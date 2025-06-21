@@ -3,13 +3,13 @@ import argparse
 import json
 from loguru import logger
 from slugify import slugify
-from llm import system_prompt
-from llm.history import History
-from llm.models import ModelManager
-from spoilers import parse_spoiler_args, generate_spoiler_prompt
-from tui.io import tt
-from tui.audio import AudioMode
-from camera.camera_protocol import CameraProtocol
+from witmo.llm import system_prompt
+from witmo.llm.history import History
+from witmo.llm.models import ModelManager
+from witmo.spoilers import parse_spoiler_args, generate_spoiler_prompt
+from witmo.tui.io import tt
+from witmo.tui.audio import AudioMode
+from witmo.camera.camera_protocol import CameraProtocol
 
 
 class Session:
@@ -60,16 +60,16 @@ class Session:
         logger.debug("Initializing camera...")
         if args.no_camera:
             logger.info("Running in no-camera mode.")
-            from camera.no_camera import NoCamera
+            from witmo.camera.no_camera import NoCamera
 
             obj.camera = NoCamera()
         elif args.test_camera:
             logger.info("Using TestCamera for local testing.")
-            from camera.test_camera import TestCamera
+            from witmo.camera.test_camera import TestCamera
 
             obj.camera = TestCamera(obj.output_dir)
         else:
-            from camera.adb_camera import AdbCamera
+            from witmo.camera.adb_camera import AdbCamera
 
             obj.camera = AdbCamera(args.delete_remote, obj.output_dir)
 

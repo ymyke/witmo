@@ -1,7 +1,7 @@
 import os
 import random
-from image import BasicImage
 from loguru import logger
+from witmo.image import BasicImage
 from .camera_protocol import CameraProtocol
 
 

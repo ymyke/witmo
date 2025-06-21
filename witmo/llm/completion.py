@@ -1,6 +1,6 @@
 import sys
 from loguru import logger
-from image import Image
+from witmo.image import Image
 from .history import History
 
 

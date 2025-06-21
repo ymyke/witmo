@@ -1,10 +1,9 @@
-from image import CroppedImage, BasicImage, Image
-from session import Session
+from witmo.image import CroppedImage, BasicImage, Image
+from witmo.session import Session
 from readchar import readkey, key
-from llm.completion import generate_completion
-from tui import select_prompt
-from tui import select_llm
-from tui.io import (
+from witmo.llm.completion import generate_completion
+from witmo.tui import select_prompt, select_llm
+from witmo.tui.io import (
     tt,
     tp,
     menu_panel,
@@ -14,7 +13,7 @@ from tui.io import (
     dot_animation,
     background_animation,
 )
-from tui.audio import play_ding, speak_text
+from witmo.tui.audio import play_ding, speak_text
 
 
 main_menu = [

@@ -1,7 +1,7 @@
 import os
 import json
 from loguru import logger
-from tui.io import tt
+from witmo.tui.io import tt
 
 class History:
     def __init__(self, file_location: str, file_name: str = "chat_history.json"):

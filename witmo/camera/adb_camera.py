@@ -14,9 +14,9 @@ To set up adb:
 
 import os
 import time
-from ppadb.client import Client as AdbClient
-from image import BasicImage
 from loguru import logger
+from ppadb.client import Client as AdbClient
+from witmo.image import BasicImage
 from .camera_protocol import CameraProtocol
 
 

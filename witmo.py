@@ -21,11 +21,11 @@ Main Loop:
 import sys
 from loguru import logger
 from wakepy import keep
-from argparsing import parse
-from session import Session
-from mainloop import mainloop
-from image import BasicImage
-from tui.io import tt, tp, welcome_panel
+from witmo.argparsing import parse
+from witmo.session import Session
+from witmo.mainloop import mainloop
+from witmo.image import BasicImage
+from witmo.tui.io import tt, tp, welcome_panel
 
 greeting_pattern = """\
 🎮🎓 WITMO - G{{AI}}MING COACH 🎓🎮
