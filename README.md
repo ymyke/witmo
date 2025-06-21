@@ -1,39 +1,24 @@
-
-# rich interface
-
-- welcome screen: displayed just once, nice and fancy.
-- llm requests: part of main loop, prominent but not super prominent
-- llm responses: main outcome of the entire app, prominent, premium, good to read, render as markdown
-- system messages/updates: regular, subdued, medium grey?
-- menus: all menus as nice tables of key/menu pairs
-  - main menu: capture screens etc.; often
-  - select prompt menu: to select prompt to send along with image; often
-  - utility menus: any other menu of minor importance; rarely, make "unaufgeregt"
-- user text input: for custom prompts; regularly, clear and readable
-
-
-
 # README notes
 
 - mention that it currently supports ER but can be extended used for any game, esp when adding a prompt pack. cf ...
+- only tested on win + pwsh/terminal + python 3.11, no other testing done
+- mention default prompt pack
+  - mention currently known games
+
+- list requirements
+- explain how to enable debug mode
 
 # Calls
 
-python ./witmo.py -i "C:\code\witmo\history\elden-ring\cap_20250615_222200.jpg" -nc -s all=high story=none -g "elden ring" -l DEBUG
-python ./witmo.py -tc -s all=low story=none -g "elden ring" -c -l TRACE
-python ./witmo.py -c -d -s all=high story=none -g "elden ring"
+python ./witmo.py -i "C:\code\witmo\history\elden-ring\cap_20250615_222200.jpg" -nc -s all=high story=none -a ding -g "elden ring" -l DEBUG
+python ./witmo.py -tc -s all=low story=none -g "elden ring" -c -a ding -l TRACE
+python ./witmo.py -c -d -s all=high story=none -g "elden ring" -a ding
 
 
 # TODO
 
-- make the markdown output able to handle " • " as bullet points
-- maybe print 2-column output if the response is too long?
 - remove openapi key from entire history
-- review all the messages/prints
 - clean up all dependencies and produce a nice requirements.txt or poetry file.
-- display capture again
-- generic prompt pack for any game w/o specific pack?
-- android app?
 
 -----------------------------------
 
@@ -59,10 +44,7 @@ python ./witmo.py -c -d -s all=high story=none -g "elden ring"
 
 -----------------------------------
 
-# readme / manual notes
 
-- list requirements
-- explain how to enable debug mode
 
 ## Spoiler Settings (CLI)
 
@@ -82,7 +64,7 @@ Levels: none, low, medium, high
 
 You can combine as many category=level pairs as you want:
 
-    python witmo.py --spoilers items=high bosses=medium mechanics=low halo
+    python witmo.py --spoilers items=high bosses=medium mechanics=low -g "baldur's gate 3"
 
 ## Usage Example (with explicit game name)
 
