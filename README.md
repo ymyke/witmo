@@ -1,6 +1,6 @@
 # 🎮 Witmo - your personal g{ai}ming coach 🎓
 
-Witmo is your friendly AI-powered gaming coach: it captures gameplay images, analyzes your situation, and gives you specific, spoiler-aware advice — just like a pro gamer buddy!
+Witmo is your friendly AI-powered gaming coach: it captures gameplay images, analyzes your situation, and gives you specific, spoiler-aware advice — just like a pro gamer buddy.
 
 ![Witmo Banner](https://via.placeholder.com/800x200?text=Witmo+-+AI+Gaming+Coach)
 
@@ -17,6 +17,7 @@ Witmo is your friendly AI-powered gaming coach: it captures gameplay images, ana
 - 🎵 **Audio feedback**: Optional text-to-speech and sound notifications
 - 📝 **Conversation history**: Maintains context of your previous questions
 - 🎮 **Game-specific prompts**: Tailored prompts for supported games
+- 🖥️ **Terminal-based interface**: No other UI (whether you call that a feature or not is up to you...)
 
 ## 📋 Requirements
 
@@ -28,7 +29,7 @@ Witmo is your friendly AI-powered gaming coach: it captures gameplay images, ana
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/username/witmo.git
+   git clone https://github.com/ymyke/witmo.git
    cd witmo
    ```
 
@@ -49,23 +50,23 @@ Witmo is your friendly AI-powered gaming coach: it captures gameplay images, ana
 
 ## 📱 Phone setup
 
-1. Enable Developer Options on your Android device:
-   - Go to Settings > About Phone
+1. Enable developer options on your Android device:
+   - Go to Settings > About Phone.
    - Tap "Build Number" seven times until you see "You are now a developer!"
 
-2. Enable USB Debugging:
-   - Go to Settings > System > Developer Options
-   - Enable "USB Debugging"
-   - Connect your phone to your computer via USB
-   - Select "Allow USB Debugging" when prompted on your phone
+2. Enable USB debugging:
+   - Go to Settings > System > Developer Options.
+   - Enable "USB Debugging".
+   - Connect your phone to your computer via USB.
+   - Select "Allow USB Debugging" when prompted on your phone.
    - Security note: Your phone will authenticate your computer and only allow connections from it in the future.
 
 3. Prepare your camera app:
-   - Open your phone's camera app
-   - Position it so it has a clear view of your gaming screen
-   - Make sure the camera app is in the foreground before starting Witmo
+   - Open your phone's camera app.
+   - Position it so it has a clear view of your gaming screen.
+   - Make sure the camera app is in the foreground before starting Witmo.
 
-## 🎲 Usage
+## 🎮 Usage
 
 ### Basic command
 
@@ -89,18 +90,17 @@ python ./witmo.py -c -d -a ding -s all=high story=none -g "elden ring"
 Show all options with `-h` or `--help`. The remaining options are mostly for debugging and testing purposes.
 
 
-### Spoiler control
+## 🙈 Spoiler control
 
-You can control what types of spoilers Witmo is allowed to reveal using the `--spoilers` flag:
+You can control what types of spoilers Witmo is allowed to reveal using the `--spoilers` flag and setting levels for different categories. The levels are:
 
-| Level    | Description                                        | Example                                                                                           |
-| -------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `none`   | Generic advice; no names/locations/items/bosses    | "Pay attention to the dialogue—it may clue you in on what's coming next."                         |
-| `low`    | Broad hints; indirect, no proper nouns             | "Some characters' backstories become important later—keep an ear out for their personal details." |
-| `medium` | Concrete strategies; names, item categories        | "After you meet the Silver Regent in Act II, her true motives will shape the final chapters."     |
-| `high`   | Full deep details; stats, coordinates, plot twists | "In Chapter 5 you'll discover that the Mentor was the antagonist all along."                      |
+- `none`: No spoilers, generic advice only
+- `low`: Broad hints, no specific names or locations
+- `medium`: Concrete strategies, may include names and item categories
+- `high`: Full deep details, including stats and plot twists
 
-You can set spoiler levels for different categories:
+The categories are:
+
 - `items`, `locations`, `enemies`, `bosses`, `story`, `lore`, `mechanics`
 - `all` for a blanket setting across all categories
 
@@ -110,7 +110,16 @@ You can combine these in a single command. For example, to set all spoilers to m
 --spoilers all=medium story=none lore=high mechanics=high
 ```
 
-Behind the scenes, the settings are added to the system prompt sent to the AI (see [`spoilers.py`](spoilers.py)). So this depends on the model's ability to respect these preferences. 
+Behind the scenes, the settings are added to the system prompt sent to the AI. So this depends on the model's ability to respect these preferences. See also [`spoilers.py`](spoilers.py)) for full details. For example, there's also these two rules:
+
+> If it's clear where the player currently is in the game's progression, you may freely
+reference any content up to that point (past). Only details beyond that point (future)
+are subject to the spoiler-level rules below. Always give rich, local detail—only future
+content is gated by spoilers. 
+
+> On all levels above "low," you should mention any key items, quests, or mechanics the
+user absolutely shouldn't miss for later in the game.  
+
 
 
 
@@ -120,7 +129,7 @@ Witmo currently supports 3 OpenAI models (o3, gpt-4o, and gpt-4.5-preview) and y
 
 
 
-### Conversation History
+## 📝 Conversation history
 
 Witmo maintains conversation history to provide context for the AI:
 
@@ -130,16 +139,14 @@ Witmo maintains conversation history to provide context for the AI:
 - The most recent 10 messages are sent to the LLM for context.
 
 
-### System prompt
+## ⚙️ System prompt
 
 Check out [`llm/system_prompt.py`](llm/system_prompt.py).
 
 
-## 🔊 Audio Features
+## 🔊 Audio features
 
-Witmo offers several audio options to enhance your experience:
-
-### Audio Modes
+Witmo offers several audio modes to enhance your experience:
 
 | Mode    | Description                                                                    |
 | ------- | ------------------------------------------------------------------------------ |
@@ -150,7 +157,7 @@ Witmo offers several audio options to enhance your experience:
 
 
 
-## 🗂️ Prompt Packs
+## 🗂️ Prompt packs
 
 Witmo uses "prompt packs" to provide game-specific advice and context. A prompt pack is a file (see [`prompt_map.json`](prompt_map.json)) that defines tailored prompts for a particular game. 
 
@@ -160,13 +167,13 @@ Witmo uses "prompt packs" to provide game-specific advice and context. A prompt 
 
 
 
-## 🌱 Genesis & Contributing
+## 🌱 Genesis & contributing
 
 I built Witmo after picking up Elden Ring and constantly finding myself with questions mid-game. I wanted a tool that would let me quickly ask for advice based on a screenshot — no need to type out long explanations for the LLM.
 
 Contributions, ideas, and feedback are welcome! If you have suggestions, bug fixes, or want to add features or additional prompt packs, feel free to open an issue or pull request.
 
-## 📝 License
+## ⚖️ License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
