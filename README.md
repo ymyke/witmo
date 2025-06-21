@@ -184,7 +184,7 @@ Witmo uses "prompt packs" to provide game-specific prompts.
 - If no prompt pack is found for your game, Witmo falls back to a default set of prompts
   designed to work generically with most games.
 - You can create and add your own prompt packs to extend Witmo for new games — just add
-  your custom prompts to the [`prompt_map.json`](prompt_map.json) file. If you do,
+  your custom prompts to the [`prompt_pack.json`](prompt_pack.json) file. If you do,
   please consider contributing them back to the project so others can benefit too.
 
 ## 🌱 Genesis & contributing

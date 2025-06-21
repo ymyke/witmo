@@ -75,7 +75,7 @@ class Session:
 
         # Prompts:
         logger.debug("Loading prompts...")
-        with open("prompt_map.json", "r", encoding="utf-8") as f:
+        with open("prompt_pack.json", "r", encoding="utf-8") as f:
             promptmap = json.load(f)
         promptlist = promptmap.get(obj.game_name_slug, [])
         if not promptlist:
@@ -84,7 +84,7 @@ class Session:
             tt(msg, style="warning")
             promptlist = promptmap.get("default", [])
         if not promptlist:
-            msg = "No default prompts found either. Check 'prompt_map.json'."
+            msg = "No default prompts found either. Check 'prompt_pack.json'."
             logger.warning(msg)
             tt(msg, style="error")
         obj.prompts = {
