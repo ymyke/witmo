@@ -9,8 +9,6 @@ buddy.
 solid #333; padding:10px; border-radius:4px;">
 
 
----
-
 ## ✨ Key features
 
 - 📸 **Screen capture**: Connects to your Android phone via USB to capture gameplay
