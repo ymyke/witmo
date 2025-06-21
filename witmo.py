@@ -1,3 +1,23 @@
+"""Witmo - gaming coach, main module.
+
+Witmo's interaction model:
+
+Setup:
+  - Initializes camera, history, session, and other resources.
+
+Main Loop:
+  - Shows main menu with options:
+    - <space>: Image flow (capture image and get advice)
+      - Capture an image via <space> (or use image passed from command line)
+      - Choose a prompt or enter your own prompt (<enter>)
+    - <enter>: Text flow (ask a question or follow up on last response)
+      - Enter a text prompt (<enter>)
+    - "a", "p", "c", etc.: Commands
+    - <esc>: Quit the app
+  - Send prompt (and image if applicable) to LLM
+  - Receive response, display it and optionally speak it
+
+"""
 import sys
 from loguru import logger
 from wakepy import keep
