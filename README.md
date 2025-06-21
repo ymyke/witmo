@@ -110,7 +110,7 @@ You can combine these in a single command. For example, to set all spoilers to m
 --spoilers all=medium story=none lore=high mechanics=high
 ```
 
-Behind the scenes, the settings are added to the system prompt sent to the AI. So this depends on the model's ability to respect these preferences. 
+Behind the scenes, the settings are added to the system prompt sent to the AI (see [`spoilers.py`](spoilers.py)). So this depends on the model's ability to respect these preferences. 
 
 
 
@@ -160,7 +160,9 @@ Witmo uses "prompt packs" to provide game-specific advice and context. A prompt 
 
 
 
-## 🤝 Contributing
+## 🌱 Genesis & Contributing
+
+I built Witmo after picking up Elden Ring and constantly finding myself with questions mid-game. I wanted a tool that would let me quickly ask for advice based on a screenshot — no need to type out long explanations for the LLM.
 
 Contributions, ideas, and feedback are welcome! If you have suggestions, bug fixes, or want to add features or additional prompt packs, feel free to open an issue or pull request.
 
