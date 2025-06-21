@@ -1,0 +1,12 @@
+loguru
+python-slugify
+openai
+wakepy
+pygame
+rich
+textual
+readchar
+pure-python-adb
+opencv-python
+numpy
+ultralytics
