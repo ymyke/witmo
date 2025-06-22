@@ -187,15 +187,21 @@ Witmo uses "prompt packs" to provide game-specific prompts.
   your custom prompts to the [`prompt_pack.json`](prompt_pack.json) file. If you do,
   please consider contributing them back to the project so others can benefit too.
 
+
 ## 🌱 Genesis & contributing
 
-I built Witmo after picking up Elden Ring and constantly finding myself with questions
-mid-game. I wanted a tool that would let me quickly ask for advice based on a screenshot
-— no need to type out long explanations for the LLM.
+I created Witmo after picking up Elden Ring and constantly running into questions
+mid-game. I wanted a tool that would let me quickly get advice based on a screenshot —
+without having to type long explanations for an LLM or repeatedly pull out my phone to
+retype the same prompt. So, instead of playing, I built Witmo.
+
+Witmo is fully functional and I use it regularly, but there’s still room for
+improvement. Beyond being a useful app, it’s also a playground for experimenting with
+LLMs, image processing, and other technologies that might enhance gaming experiences.
 
 Contributions, ideas, and feedback are welcome! If you have suggestions, bug fixes, or
-want to add features or additional prompt packs, feel free to open an issue or pull
-request.
+want to add features or additional prompt packs, please open an issue or pull request.
+
 
 ## ⚖️ License
 
