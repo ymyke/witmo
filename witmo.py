@@ -3,10 +3,10 @@
 Witmo's interaction model:
 
 Setup:
-  - Initializes camera, history, session, and other resources.
+  - Initialize camera, history, session, and other resources.
 
 Main Loop:
-  - Shows main menu with options:
+  - Show main menu with options:
     - <space>: Image flow (capture image and get advice)
       - Capture an image via <space> (or use image passed from command line)
       - Choose a prompt or enter your own prompt (<enter>)
