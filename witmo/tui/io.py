@@ -40,7 +40,9 @@ PANEL_WIDE_WIDTH = 140
 
 
 def tt(thing=None, style: Literal["error", "warning"] | None = None) -> None:
-    """Transient tui output."""
+    """Transient tui output. (E.g., menus and update messages, which will be cleared
+    whenever "real" content such as requests or responses is displayed.)
+    """
     thing = thing or ""
     if isinstance(thing, str):
         stylemap = {
