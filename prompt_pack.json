@@ -1,0 +1,76 @@
+{
+    "elden-ring": [
+        {
+            "prompt": "Describe what we see here and help me understand what's happening. Focus on giving me insights, help me understand, provide truly useful information.",
+            "summary": "General understanding",
+            "key": "g"
+        },
+        {
+            "prompt": "What is the most important, non-trivial hint you can give for this situation?",
+            "summary": "Hint",
+            "key": "h"
+        },
+        {
+            "prompt": "Give me the story and lore background I might have missed to understand this situation better. Focus on lore, characters, and events that are relevant to the current context. Only mention things from the game past, nothing from the game future.",
+            "summary": "Story background",
+            "key": "b"
+        },
+        {
+            "prompt": "Which of these items can I safely sell (e.g., because they are abundant) and which should I definitely keep?",
+            "summary": "Sellable items",
+            "key": "s"
+        },
+        {
+            "prompt": "For the current level of my character, is this a good weapon or should I be able to find something much better?",
+            "summary": "Weapon evaluation",
+            "key": "w"
+        },
+        {
+            "prompt": "What are some really useful things I can craft with the items I have?",
+            "summary": "Crafting ideas",
+            "key": "c"
+        },
+        {
+            "prompt": "What is a very funny joke that is specific to this situtation?",
+            "summary": "Joke",
+            "key": "j"
+        }
+    ],
+    "default": [
+        {
+            "prompt": "Describe what’s happening in this game situation. What should I be aware of?",
+            "summary": "General understanding",
+            "key": "g"
+        },
+        {
+            "prompt": "What’s the most important, non-obvious tip for this moment/situation?",
+            "summary": "Hint",
+            "key": "h"
+        },
+        {
+            "prompt": "Give me relevant story, lore, or context I might have missed so far.",
+            "summary": "Background",
+            "key": "b"
+        },
+        {
+            "prompt": "Which items or resources should I keep, use, or get rid of?",
+            "summary": "Inventory advice",
+            "key": "s"
+        },
+        {
+            "prompt": "Is my current equipment or setup good for this stage? Should I look for upgrades?",
+            "summary": "Equipment evaluation",
+            "key": "w"
+        },
+        {
+            "prompt": "What useful things can I make or do with what I have right now?",
+            "summary": "Crafting ideas",
+            "key": "c"
+        },
+        {
+            "prompt": "Tell me a very funny joke that only works with this game and is specific to this situation.",
+            "summary": "Joke",
+            "key": "j"
+        }
+    ]
+}

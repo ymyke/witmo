@@ -1,18 +1,19 @@
 import os
 import random
-from image import Image
 from loguru import logger
+from witmo.image import BasicImage
+from .camera_protocol import CameraProtocol
 
 
-class TestCamera:
+class TestCamera(CameraProtocol):
     """A simple test camera that returns a random image from the output_dir on capture."""
 
-    def __init__(self, do_delete_remote: bool = False, output_dir="captures"):
+    def __init__(self, output_dir="captures"):
         self.output_dir = output_dir
         if not os.path.exists(self.output_dir):
             raise ValueError(f"Output directory does not exist: {self.output_dir}")
 
-    def capture(self) -> Image:
+    def capture(self) -> BasicImage:
         images = [
             f
             for f in os.listdir(self.output_dir)
@@ -24,7 +25,7 @@ class TestCamera:
             raise RuntimeError(f"No images found in {self.output_dir}")
         chosen = random.choice(images)
         logger.info(f"Selected test image: {chosen}")
-        return Image(os.path.join(self.output_dir, chosen))
+        return BasicImage(os.path.join(self.output_dir, chosen))
 
     def __enter__(self):
         return self

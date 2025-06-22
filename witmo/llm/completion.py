@@ -1,14 +1,7 @@
-import os
+import sys
 from loguru import logger
-from history import History
-from image import Image
-from openai import OpenAI
-
-# Set up OpenAI client:
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY environment variable not set.")
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+from witmo.image import Image
+from .history import History
 
 
 def generate_completion(
@@ -16,8 +9,8 @@ def generate_completion(
     *,
     image: Image | None = None,
     history: History | None = None,
-    SYSTEM_PROMPT,
     model: str = "o3",
+    system_prompt: str | None = None,
 ) -> str:
     """
     Handles message marshalling for both text and image+text completions, calls LLM, updates history.
@@ -25,8 +18,8 @@ def generate_completion(
     logger.info(f"Sending message to LLM... (image={'yes' if image else 'no'})")
     logger.info(f"Request: {question}")
 
-    system_message = SYSTEM_PROMPT
-    messages = [{"role": "system", "content": system_message}]
+    if system_prompt:
+        messages = [{"role": "system", "content": system_prompt}]
 
     if history:
         messages.extend(history.last(10))
@@ -49,6 +42,8 @@ def generate_completion(
     messages.append(user_message)
 
     # Call OpenAI model:
+    if "openai_client" not in sys.modules:
+        from .openai_client import openai_client
     response = openai_client.chat.completions.create(
         model=model,
         messages=messages,  # type: ignore
@@ -58,8 +53,11 @@ def generate_completion(
         logger.error("Received empty response from LLM.")
         content = "<<no response>>"
 
-    if history:
+    if history is not None:
+        logger.debug(f"Adding interaction to history")
         history.append(user_message)
         history.append({"role": "assistant", "content": content})
+    else:
+        logger.debug("No history provided, skipping history update.")
 
     return content
